@@ -126,22 +126,9 @@ def fuzzy_match_names(dk_name, fd_names, threshold=0.8):
     return None
 
 
-watchlist_raw = [
-    "Kyle Schwarber",
-    "Bobby Witt Jr",
-    "Salvador Perez",
-    "Bryce Harper",
-    "Willson Contreras",
-    "Isaac Paredes",
-    "Fernando Tatis Jr",
-    "Samuel Basallo",
-    "Jac Caglianone",
-    "Jake Bauers",
-    "Joc Pederson",
-    "Kody Clemens",
-    "Andrew Benintendi",
-    "Rhys Hoskins",
-]
+# Read watchlist from file
+with open("watchlist.txt", "r", encoding="utf-8") as f:
+    watchlist_raw = [line.strip() for line in f if line.strip()]
 
 watchlist = set(clean(x) for x in watchlist_raw)
 
