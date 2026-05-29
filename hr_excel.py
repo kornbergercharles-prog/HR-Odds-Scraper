@@ -140,7 +140,7 @@ watchlist_raw = [
     "Joc Pederson",
     "Kody Clemens",
     "Andrew Benintendi",
-    "Colt Keith",
+    "Rhys Hoskins",
 ]
 
 watchlist = set(clean(x) for x in watchlist_raw)
