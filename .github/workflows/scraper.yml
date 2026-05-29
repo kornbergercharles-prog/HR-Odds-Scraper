@@ -3,9 +3,6 @@ name: HR Odds Scraper
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   scrape:
     runs-on: ubuntu-latest
@@ -38,10 +35,9 @@ jobs:
       - name: Run Excel export
         run: python hr_excel.py
       
-      - name: Commit Excel file to repo
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add hr_odds.xlsx
-          git commit -m "Update hr_odds.xlsx - $(date)" || echo "No changes to commit"
-          git push
+      - name: Upload Excel to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hr_odds
+          path: hr_odds.xlsx
+          retention-days: 30
