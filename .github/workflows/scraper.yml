@@ -31,7 +31,7 @@ jobs:
         run: python hr_excel.py
       
       - name: Upload Excel to artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: hr_odds
           path: hr_odds.xlsx
