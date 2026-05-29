@@ -41,7 +41,7 @@ jobs:
       - name: Upload to Google Drive
         env:
           GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
-          GOOGLE_DRIVE_FOLDER_ID: YOUR_FOLDER_ID_HERE
+          GOOGLE_DRIVE_FOLDER_ID: 1vu4ey1C0PHjhurSyXLKPrOxXp3avvc5K
         run: python upload_to_drive.py
       
       - name: Commit Excel file to repo
