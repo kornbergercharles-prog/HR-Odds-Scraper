@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests pandas openpyxl playwright beautifulsoup4 google-auth-oauthlib google-auth-httplib2 google-api-python-client
+          pip install requests pandas openpyxl playwright beautifulsoup4
           playwright install chromium
       
       - name: Install xvfb (virtual display)
@@ -37,12 +37,6 @@ jobs:
       
       - name: Run Excel export
         run: python hr_excel.py
-      
-      - name: Upload to Google Drive
-        env:
-          GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
-          GOOGLE_DRIVE_FOLDER_ID: 1vu4ey1C0PHjhurSyXLKPrOxXp3avvc5K
-        run: python upload_to_drive.py
       
       - name: Commit Excel file to repo
         run: |
