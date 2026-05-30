@@ -141,18 +141,42 @@ dk_df["fd_match"] = dk_df["player"].apply(
     lambda x: fuzzy_match_names(x, fd_names_list, threshold=0.75)
 )
 
-# Merge on matched names
-df = dk_df.copy()
-df = df.merge(fd_df, left_on="fd_match", right_on="player", how="left", suffixes=("", "_fd"))
+# Start with all DK players
+df = dk_df[["player", "dk_odds"]].copy()
 
-# Clean up columns
-df = df[["player", "dk_odds", "fd_odds"]].drop_duplicates(subset=["player"])
+# Merge with FanDuel data based on fuzzy match
+df = df.merge(
+    fd_df[["player", "fd_odds"]], 
+    left_on="fd_match", 
+    right_on="player", 
+    how="left", 
+    suffixes=("", "_fd")
+)
 
+# Drop the fd match column and rename
+df = df.drop(columns=["fd_match"])
+if "player_fd" in df.columns:
+    df = df.drop(columns=["player_fd"])
+
+# Add any FanDuel-only players (not matched to DK)
+matched_fd_players = df[df["fd_odds"].notna()]["player_fd"].unique() if "player_fd" in df.columns else []
+fd_only = fd_df[~fd_df["player"].isin(matched_fd_players) & ~fd_df["player"].isin(dk_df["player"])].copy()
+fd_only["dk_odds"] = None
+fd_only = fd_only.rename(columns={"player": "player", "fd_odds": "fd_odds"})
+
+# Combine DK + matched FD + FD-only
+if len(fd_only) > 0:
+    df = pd.concat([df, fd_only[["player", "dk_odds", "fd_odds"]]], ignore_index=True)
+
+df = df.drop_duplicates(subset=["player"])
+
+# Calculate implied probabilities
 df["dk_implied"] = df["dk_odds"].apply(implied_prob)
 df["fd_implied"] = df["fd_odds"].apply(implied_prob)
 df["avg_implied"] = df[["dk_implied", "fd_implied"]].mean(axis=1)
-df = df.sort_values("avg_implied", ascending=False)
+df = df.sort_values("avg_implied", ascending=False, na_position="last")
 
+# Build display dataframe
 out = pd.DataFrame({
     "Player":           df["player"],
     "DK Odds":          df["dk_odds"].fillna("—"),
