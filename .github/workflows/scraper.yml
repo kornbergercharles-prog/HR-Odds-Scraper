@@ -47,9 +47,9 @@ jobs:
       - name: Upload Excel as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hr_odds
+          name: hr_odds.xlsx
           path: hr_odds.xlsx
-          retention-days: 30
+          compression-level: 0
       
       - name: Commit files to repo
         run: |
