@@ -38,6 +38,13 @@ jobs:
       - name: Run Excel export
         run: python hr_excel.py
       
+      - name: Upload Excel as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hr_odds
+          path: hr_odds.xlsx
+          retention-days: 30
+      
       - name: Commit files to repo
         run: |
           git config --local user.email "action@github.com"
