@@ -35,9 +35,12 @@ jobs:
       - name: Run Excel export
         run: python hr_excel.py
       
-      - name: Upload Excel to artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: hr_odds
-          path: hr_odds.xlsx
-          retention-days: 30
+      - name: Commit files to repo
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add hr_odds.xlsx
+          git add fanduel_responses.json
+          git add all_responses.json
+          git commit -m "Update odds files - $(date)" || echo "No changes to commit"
+          git push
