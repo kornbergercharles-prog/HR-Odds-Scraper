@@ -132,6 +132,7 @@ with open("watchlist.txt", "r", encoding="utf-8") as f:
 
 watchlist = set(clean(x) for x in watchlist_raw)
 
+# Parse both sportsbooks
 dk_df = parse_dk()
 fd_df = parse_fanduel()
 
@@ -141,42 +142,37 @@ dk_df["fd_match"] = dk_df["player"].apply(
     lambda x: fuzzy_match_names(x, fd_names_list, threshold=0.75)
 )
 
-# Start with all DK players
-df = dk_df[["player", "dk_odds"]].copy()
-
-# Merge with FanDuel data based on fuzzy match
-df = df.merge(
-    fd_df[["player", "fd_odds"]], 
-    left_on="fd_match", 
-    right_on="player", 
-    how="left", 
-    suffixes=("", "_fd")
+# Merge: DK (left) with FD (right) based on fuzzy match
+merged = dk_df.merge(
+    fd_df,
+    left_on="fd_match",
+    right_on="player",
+    how="left",
+    suffixes=("_dk", "_fd")
 )
 
-# Drop the fd match column and rename
-df = df.drop(columns=["fd_match"])
-if "player_fd" in df.columns:
-    df = df.drop(columns=["player_fd"])
+# Keep only the columns we need
+merged = merged[["player_dk", "dk_odds", "player_fd", "fd_odds"]].copy()
+merged = merged.rename(columns={"player_dk": "player"})
+merged = merged.drop(columns=["player_fd"])
 
-# Add any FanDuel-only players (not matched to DK)
-matched_fd_players = df[df["fd_odds"].notna()]["player_fd"].unique() if "player_fd" in df.columns else []
-fd_only = fd_df[~fd_df["player"].isin(matched_fd_players) & ~fd_df["player"].isin(dk_df["player"])].copy()
+# Find FanDuel-only players (not matched to any DK player)
+matched_fd_players = set(merged["player"].dropna().unique())
+fd_only_mask = ~fd_df["player"].isin(matched_fd_players) & ~fd_df["player"].isin(dk_df["player"])
+fd_only = fd_df[fd_only_mask][["player", "fd_odds"]].copy()
 fd_only["dk_odds"] = None
-fd_only = fd_only.rename(columns={"player": "player", "fd_odds": "fd_odds"})
 
-# Combine DK + matched FD + FD-only
-if len(fd_only) > 0:
-    df = pd.concat([df, fd_only[["player", "dk_odds", "fd_odds"]]], ignore_index=True)
-
+# Combine DK+FD matches with FD-only players
+df = pd.concat([merged, fd_only], ignore_index=True)
 df = df.drop_duplicates(subset=["player"])
 
-# Calculate implied probabilities
+# Calculate implied probabilities and sort
 df["dk_implied"] = df["dk_odds"].apply(implied_prob)
 df["fd_implied"] = df["fd_odds"].apply(implied_prob)
 df["avg_implied"] = df[["dk_implied", "fd_implied"]].mean(axis=1)
 df = df.sort_values("avg_implied", ascending=False, na_position="last")
 
-# Build display dataframe
+# Build output dataframe
 out = pd.DataFrame({
     "Player":           df["player"],
     "DK Odds":          df["dk_odds"].fillna("—"),
@@ -186,6 +182,7 @@ out = pd.DataFrame({
     "Avg Impl. Prob":   df["avg_implied"].apply(fmt_prob),
 })
 
+# Styling
 yellow      = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
 dark_blue   = PatternFill(start_color="1F4E79", end_color="1F4E79", fill_type="solid")
 header_font = Font(bold=True, color="FFFFFF", name="Arial", size=10)
