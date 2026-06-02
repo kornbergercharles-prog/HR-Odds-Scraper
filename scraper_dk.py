@@ -13,6 +13,11 @@ response = requests.get(url, headers=headers)
 
 print("STATUS CODE:", response.status_code)
 
+if response.status_code != 200:
+    print("FAILED RESPONSE:")
+    print(response.text[:1000])
+    raise Exception(f"Bad status code: {response.status_code}")
+
 data = response.json()
 
 with open("all_responses.json", "w", encoding="utf-8") as f:
