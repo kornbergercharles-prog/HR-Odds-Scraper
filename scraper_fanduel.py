@@ -69,6 +69,15 @@ def deduplicate(results):
             deduped.append(r)
     return deduped
 
+def looks_like_hr_odds(results):
+    if not results:
+        return False
+    positive = sum(1 for r in results if r["fd_odds"].startswith("+"))
+    total = len(results)
+    ratio = positive / total
+    print(f"Positive odds ratio: {positive}/{total} = {ratio:.0%}")
+    return ratio >= 0.7
+
 async def get_page_text(page):
     return await page.evaluate("""
         () => {
@@ -96,12 +105,18 @@ async def scrape_parlay_builder(page):
     await page.goto(TARGET_URL, wait_until="domcontentloaded", timeout=60000)
     await asyncio.sleep(10)
 
+    page_text = await page.inner_text("body")
+    if "parlay builder" not in page_text.lower():
+        print("Parlay Builder section not found on page — skipping")
+        return []
+
     try:
         hr = page.get_by_text("To Hit a Home Run Parlay Builder", exact=False)
         await hr.first.click()
         print("Clicked HR section")
     except Exception as e:
         print(f"Click failed: {e}")
+        return []
 
     await asyncio.sleep(8)
 
@@ -119,10 +134,16 @@ async def scrape_parlay_builder(page):
 
     await asyncio.sleep(5)
     all_text = await get_page_text(page)
-    return extract_odds_from_text(all_text)
+    results = extract_odds_from_text(all_text)
+
+    if not looks_like_hr_odds(results):
+        print("Results don't look like HR odds — falling back")
+        return []
+
+    return results
 
 async def scrape_player_props(page):
-    print("Parlay Builder unavailable — trying Player Props tab...")
+    print("Trying Player Props tab...")
     await page.goto(PLAYER_PROPS_URL, wait_until="domcontentloaded", timeout=60000)
     await asyncio.sleep(10)
 
@@ -166,7 +187,7 @@ async def capture():
         results = await scrape_parlay_builder(page)
 
         if not results:
-            print("No results from Parlay Builder — falling back to Player Props")
+            print("Falling back to Player Props...")
             results = await scrape_player_props(page)
 
         await browser.close()
