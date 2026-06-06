@@ -1,10 +1,11 @@
-nimport json
+import json
 import asyncio
 from playwright.async_api import async_playwright
 
 print("DOWNLOADING LIVE FANDUEL DATA...")
 
 TARGET_URL = "https://sportsbook.fanduel.com/navigation/mlb?tab=parlay-builder"
+PLAYER_PROPS_URL = "https://sportsbook.fanduel.com/navigation/mlb?tab=player-props"
 
 SKIP_NAMES = {
     "fanduel sportsbook", "my bets", "log in", "join now", "live now",
@@ -37,9 +38,120 @@ SKIP_NAMES = {
     "rugby league", "rugby union", "soccer", "tennis"
 }
 
-async def capture():
+def extract_odds_from_text(all_text):
     results = []
+    last_name = None
+    for t in all_text:
+        t = t.strip()
+        if not t:
+            continue
+        is_odds = (t.startswith("+") or t.startswith("-")) and t[1:].isdigit()
+        is_name = (
+            len(t) > 4 and
+            len(t) < 40 and
+            t[0].isupper() and
+            " " in t and
+            t.lower() not in SKIP_NAMES
+        )
+        if is_name:
+            last_name = t
+        elif is_odds and last_name:
+            results.append({"player": last_name, "fd_odds": t})
+            last_name = None
+    return results
 
+def deduplicate(results):
+    seen = set()
+    deduped = []
+    for r in results:
+        if r["player"] not in seen:
+            seen.add(r["player"])
+            deduped.append(r)
+    return deduped
+
+async def get_page_text(page):
+    return await page.evaluate("""
+        () => {
+            function getTextFromNode(node) {
+                let text = [];
+                if (node.shadowRoot) {
+                    text = text.concat(getTextFromNode(node.shadowRoot));
+                }
+                for (let child of node.childNodes) {
+                    if (child.nodeType === 3) {
+                        let t = child.textContent.trim();
+                        if (t) text.push(t);
+                    } else if (child.nodeType === 1) {
+                        text = text.concat(getTextFromNode(child));
+                    }
+                }
+                return text;
+            }
+            return getTextFromNode(document.body);
+        }
+    """)
+
+async def scrape_parlay_builder(page):
+    print("Trying Parlay Builder tab...")
+    await page.goto(TARGET_URL, wait_until="domcontentloaded", timeout=60000)
+    await asyncio.sleep(10)
+
+    try:
+        hr = page.get_by_text("To Hit a Home Run Parlay Builder", exact=False)
+        await hr.first.click()
+        print("Clicked HR section")
+    except Exception as e:
+        print(f"Click failed: {e}")
+
+    await asyncio.sleep(8)
+
+    clicked = 0
+    while True:
+        try:
+            show_more = page.get_by_text("Show more", exact=False).first
+            await show_more.wait_for(timeout=3000)
+            await show_more.click()
+            clicked += 1
+            await asyncio.sleep(2)
+        except Exception:
+            break
+    print(f"Clicked Show more {clicked} times")
+
+    await asyncio.sleep(5)
+    all_text = await get_page_text(page)
+    return extract_odds_from_text(all_text)
+
+async def scrape_player_props(page):
+    print("Parlay Builder unavailable — trying Player Props tab...")
+    await page.goto(PLAYER_PROPS_URL, wait_until="domcontentloaded", timeout=60000)
+    await asyncio.sleep(10)
+
+    try:
+        hr = page.get_by_text("To Hit a Home Run", exact=False)
+        await hr.first.click()
+        print("Clicked HR section in Player Props")
+    except Exception as e:
+        print(f"Click failed: {e}")
+
+    await asyncio.sleep(5)
+
+    clicked = 0
+    while True:
+        try:
+            show_more = page.get_by_text("Show more", exact=False).first
+            await show_more.wait_for(timeout=3000)
+            await show_more.click()
+            clicked += 1
+            await asyncio.sleep(2)
+        except Exception:
+            break
+    print(f"Clicked Show more {clicked} times")
+
+    await asyncio.sleep(5)
+    all_text = await get_page_text(page)
+    return extract_odds_from_text(all_text)
+
+async def capture():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False)
         context = await browser.new_context(
@@ -50,88 +162,21 @@ async def capture():
             )
         )
         page = await context.new_page()
-        await page.goto(TARGET_URL, wait_until="domcontentloaded", timeout=60000)
-        await asyncio.sleep(10)
 
-        try:
-            hr = page.get_by_text("To Hit a Home Run Parlay Builder", exact=False)
-            await hr.first.click()
-            print("Clicked HR section")
-        except Exception as e:
-            print(f"Click failed: {e}")
+        results = await scrape_parlay_builder(page)
 
-        await asyncio.sleep(8)
-
-        clicked = 0
-        while True:
-            try:
-                show_more = page.get_by_text("Show more", exact=False).first
-                await show_more.wait_for(timeout=3000)
-                await show_more.click()
-                clicked += 1
-                await asyncio.sleep(2)
-            except Exception:
-                break
-        print(f"Clicked Show more {clicked} times")
-
-        await asyncio.sleep(5)
-
-        all_text = await page.evaluate("""
-            () => {
-                function getTextFromNode(node) {
-                    let text = [];
-                    if (node.shadowRoot) {
-                        text = text.concat(getTextFromNode(node.shadowRoot));
-                    }
-                    for (let child of node.childNodes) {
-                        if (child.nodeType === 3) {
-                            let t = child.textContent.trim();
-                            if (t) text.push(t);
-                        } else if (child.nodeType === 1) {
-                            text = text.concat(getTextFromNode(child));
-                        }
-                    }
-                    return text;
-                }
-                return getTextFromNode(document.body);
-            }
-        """)
-
-        # Pair up names and odds in order
-        last_name = None
-        for t in all_text:
-            t = t.strip()
-            if not t:
-                continue
-
-            is_odds = (t.startswith("+") or t.startswith("-")) and t[1:].isdigit()
-            is_name = (
-                len(t) > 4 and
-                len(t) < 40 and
-                t[0].isupper() and
-                " " in t and
-                t.lower() not in SKIP_NAMES
-            )
-
-            if is_name:
-                last_name = t
-            elif is_odds and last_name:
-                results.append({"player": last_name, "fd_odds": t})
-                last_name = None
+        if not results:
+            print("No results from Parlay Builder — falling back to Player Props")
+            results = await scrape_player_props(page)
 
         await browser.close()
 
     if not results:
-        print("WARNING: No FanDuel HR odds found.")
+        print("WARNING: No FanDuel HR odds found from either source.")
+        with open("fanduel_responses.json", "w", encoding="utf-8") as f:
+            json.dump([], f)
     else:
-        # Deduplicate keeping first occurrence
-        seen = set()
-        deduped = []
-        for r in results:
-            if r["player"] not in seen:
-                seen.add(r["player"])
-                deduped.append(r)
-
+        deduped = deduplicate(results)
         with open("fanduel_responses.json", "w", encoding="utf-8") as f:
             json.dump(deduped, f)
         print(f"Saved fanduel_responses.json ({len(deduped)} players)")
