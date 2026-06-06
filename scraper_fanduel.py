@@ -41,6 +41,48 @@ SKIP_NAMES = {
     "play free for a shot at a profit boost"
 }
 
+SHADOW_CLICK_JS = """
+    (searchText) => {
+        function findAndClick(root) {
+            let children = root.querySelectorAll ? Array.from(root.querySelectorAll('*')) : [];
+            for (let el of children) {
+                if (el.shadowRoot) {
+                    let result = findAndClick(el.shadowRoot);
+                    if (result) return true;
+                }
+                let text = el.textContent.trim();
+                if (text === searchText || text.toLowerCase() === searchText.toLowerCase()) {
+                    el.click();
+                    return true;
+                }
+            }
+            return false;
+        }
+        return findAndClick(document.body);
+    }
+"""
+
+GET_TEXT_JS = """
+    () => {
+        function getTextFromNode(node) {
+            let text = [];
+            if (node.shadowRoot) {
+                text = text.concat(getTextFromNode(node.shadowRoot));
+            }
+            for (let child of node.childNodes) {
+                if (child.nodeType === 3) {
+                    let t = child.textContent.trim();
+                    if (t) text.push(t);
+                } else if (child.nodeType === 1) {
+                    text = text.concat(getTextFromNode(child));
+                }
+            }
+            return text;
+        }
+        return getTextFromNode(document.body);
+    }
+"""
+
 def extract_odds_from_text(all_text):
     results = []
     last_name = None
@@ -81,28 +123,6 @@ def looks_like_hr_odds(results):
     print(f"Positive odds ratio: {positive}/{total} = {ratio:.0%}")
     return ratio >= 0.7
 
-async def get_page_text(page):
-    return await page.evaluate("""
-        () => {
-            function getTextFromNode(node) {
-                let text = [];
-                if (node.shadowRoot) {
-                    text = text.concat(getTextFromNode(node.shadowRoot));
-                }
-                for (let child of node.childNodes) {
-                    if (child.nodeType === 3) {
-                        let t = child.textContent.trim();
-                        if (t) text.push(t);
-                    } else if (child.nodeType === 1) {
-                        text = text.concat(getTextFromNode(child));
-                    }
-                }
-                return text;
-            }
-            return getTextFromNode(document.body);
-        }
-    """)
-
 async def scrape_parlay_builder(page):
     print("Trying Parlay Builder tab...")
     await page.goto(TARGET_URL, wait_until="domcontentloaded", timeout=60000)
@@ -136,7 +156,7 @@ async def scrape_parlay_builder(page):
     print(f"Clicked Show more {clicked} times")
 
     await asyncio.sleep(5)
-    all_text = await get_page_text(page)
+    all_text = await page.evaluate(GET_TEXT_JS)
     results = extract_odds_from_text(all_text)
 
     if not looks_like_hr_odds(results):
@@ -148,50 +168,45 @@ async def scrape_parlay_builder(page):
 async def scrape_player_props(page):
     print("Trying Player Props — expanding To Hit A Home Run dropdown...")
     await page.goto(PLAYER_PROPS_URL, wait_until="domcontentloaded", timeout=60000)
-    await asyncio.sleep(10)
+    await asyncio.sleep(15)
 
-    # Try playwright click first
-    clicked = False
-    try:
-        await page.click("text=To Hit A Home Run")
-        print("Clicked To Hit A Home Run dropdown")
-        clicked = True
-        await asyncio.sleep(5)
-    except Exception as e:
-        print(f"Playwright click failed: {e}")
-
-    # Try JavaScript click as fallback
-    if not clicked:
-        try:
-            result = await page.evaluate("""
-                () => {
-                    let walker = document.createTreeWalker(
-                        document.body,
-                        NodeFilter.SHOW_TEXT,
-                        null
-                    );
-                    let node;
-                    while (node = walker.nextNode()) {
-                        if (node.textContent.trim() === 'To Hit A Home Run') {
-                            node.parentElement.click();
+    print("Attempting shadow DOM click on To Hit A Home Run...")
+    clicked = await page.evaluate(SHADOW_CLICK_JS, "To Hit A Home Run")
+    if clicked:
+        print("Shadow DOM click succeeded")
+    else:
+        print("Shadow DOM click failed — trying partial match...")
+        clicked = await page.evaluate("""
+            () => {
+                function findAndClick(root) {
+                    let children = root.querySelectorAll ? Array.from(root.querySelectorAll('*')) : [];
+                    for (let el of children) {
+                        if (el.shadowRoot) {
+                            let result = findAndClick(el.shadowRoot);
+                            if (result) return true;
+                        }
+                        let text = el.textContent.trim().toLowerCase();
+                        if (text.includes('to hit a home run') && text.length < 30) {
+                            el.click();
                             return true;
                         }
                     }
                     return false;
                 }
-            """)
-            if result:
-                print("JS click succeeded")
-                await asyncio.sleep(5)
-            else:
-                print("JS click — element not found")
-        except Exception as e:
-            print(f"JS click failed: {e}")
+                return findAndClick(document.body);
+            }
+        """)
+        print(f"Partial match click: {clicked}")
 
-    await asyncio.sleep(5)
-    all_text = await get_page_text(page)
+    await asyncio.sleep(8)
+
+    all_text = await page.evaluate(GET_TEXT_JS)
     results = extract_odds_from_text(all_text)
     print(f"Player Props found {len(results)} players")
+
+    if results:
+        print(f"Sample: {results[:3]}")
+
     return results
 
 async def capture():
@@ -206,10 +221,8 @@ async def capture():
         )
         page = await context.new_page()
 
-        # Try 1: Parlay Builder (original — works when it returns)
         results = await scrape_parlay_builder(page)
 
-        # Try 2: Player Props dropdown
         if not results:
             print("Falling back to Player Props...")
             results = await scrape_player_props(page)
