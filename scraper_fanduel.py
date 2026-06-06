@@ -1,4 +1,4 @@
-import json
+nimport json
 import asyncio
 from playwright.async_api import async_playwright
 
@@ -54,7 +54,7 @@ async def capture():
         await asyncio.sleep(10)
 
         try:
-            hr = page.get_by_text("To Hit a Home Run", exact=False)
+            hr = page.get_by_text("To Hit a Home Run Parlay Builder", exact=False)
             await hr.first.click()
             print("Clicked HR section")
         except Exception as e:
