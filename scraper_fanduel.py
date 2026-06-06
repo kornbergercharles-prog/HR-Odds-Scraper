@@ -35,7 +35,10 @@ SKIP_NAMES = {
     "california privacy rights", "your privacy choices", "games",
     "sportsbook odds", "baseball", "basketball", "boxing", "cricket",
     "cycling", "darts", "football", "golf", "lacrosse", "mma", "motorsport",
-    "rugby league", "rugby union", "soccer", "tennis"
+    "rugby league", "rugby union", "soccer", "tennis",
+    "awards", "playoffs", "player props", "mlb player props",
+    "to record a hit", "to record an rbi", "daily dinger",
+    "play free for a shot at a profit boost"
 }
 
 def extract_odds_from_text(all_text):
@@ -107,7 +110,7 @@ async def scrape_parlay_builder(page):
 
     page_text = await page.inner_text("body")
     if "parlay builder" not in page_text.lower():
-        print("Parlay Builder section not found — skipping")
+        print("Parlay Builder not found — skipping")
         return []
 
     try:
@@ -143,55 +146,52 @@ async def scrape_parlay_builder(page):
     return results
 
 async def scrape_player_props(page):
-    print("Trying Player Props tab...")
+    print("Trying Player Props — expanding To Hit A Home Run dropdown...")
     await page.goto(PLAYER_PROPS_URL, wait_until="domcontentloaded", timeout=60000)
-    await asyncio.sleep(15)
+    await asyncio.sleep(10)
 
-    page_text = await page.inner_text("body")
-    print(f"Page loaded. Looking for HR section...")
+    # Try playwright click first
+    clicked = False
+    try:
+        await page.click("text=To Hit A Home Run")
+        print("Clicked To Hit A Home Run dropdown")
+        clicked = True
+        await asyncio.sleep(5)
+    except Exception as e:
+        print(f"Playwright click failed: {e}")
 
-    hr_clicked = False
-    click_attempts = [
-        "To Hit a Home Run",
-        "Home Run",
-        "Home Runs",
-    ]
-
-    for attempt_text in click_attempts:
+    # Try JavaScript click as fallback
+    if not clicked:
         try:
-            el = page.get_by_text(attempt_text, exact=False).first
-            await el.wait_for(timeout=5000)
-            await el.click()
-            print(f"Clicked: '{attempt_text}'")
-            hr_clicked = True
-            await asyncio.sleep(5)
-            break
-        except Exception:
-            print(f"Could not click: '{attempt_text}'")
-
-    if not hr_clicked:
-        print("Could not click HR section — extracting full page anyway")
-
-    clicked = 0
-    while True:
-        try:
-            show_more = page.get_by_text("Show more", exact=False).first
-            await show_more.wait_for(timeout=3000)
-            await show_more.click()
-            clicked += 1
-            await asyncio.sleep(2)
-        except Exception:
-            break
-    print(f"Clicked Show more {clicked} times")
+            result = await page.evaluate("""
+                () => {
+                    let walker = document.createTreeWalker(
+                        document.body,
+                        NodeFilter.SHOW_TEXT,
+                        null
+                    );
+                    let node;
+                    while (node = walker.nextNode()) {
+                        if (node.textContent.trim() === 'To Hit A Home Run') {
+                            node.parentElement.click();
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            """)
+            if result:
+                print("JS click succeeded")
+                await asyncio.sleep(5)
+            else:
+                print("JS click — element not found")
+        except Exception as e:
+            print(f"JS click failed: {e}")
 
     await asyncio.sleep(5)
     all_text = await get_page_text(page)
     results = extract_odds_from_text(all_text)
-
-    if looks_like_hr_odds(results):
-        return results
-
-    print("Player Props results don't look like HR odds either")
+    print(f"Player Props found {len(results)} players")
     return results
 
 async def capture():
@@ -206,8 +206,10 @@ async def capture():
         )
         page = await context.new_page()
 
+        # Try 1: Parlay Builder (original — works when it returns)
         results = await scrape_parlay_builder(page)
 
+        # Try 2: Player Props dropdown
         if not results:
             print("Falling back to Player Props...")
             results = await scrape_player_props(page)
