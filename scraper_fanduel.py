@@ -41,27 +41,6 @@ SKIP_NAMES = {
     "play free for a shot at a profit boost"
 }
 
-SHADOW_CLICK_JS = """
-    (searchText) => {
-        function findAndClick(root) {
-            let children = root.querySelectorAll ? Array.from(root.querySelectorAll('*')) : [];
-            for (let el of children) {
-                if (el.shadowRoot) {
-                    let result = findAndClick(el.shadowRoot);
-                    if (result) return true;
-                }
-                let text = el.textContent.trim();
-                if (text === searchText || text.toLowerCase() === searchText.toLowerCase()) {
-                    el.click();
-                    return true;
-                }
-            }
-            return false;
-        }
-        return findAndClick(document.body);
-    }
-"""
-
 GET_TEXT_JS = """
     () => {
         function getTextFromNode(node) {
@@ -71,7 +50,7 @@ GET_TEXT_JS = """
             }
             for (let child of node.childNodes) {
                 if (child.nodeType === 3) {
-                    let t = child.textContent.trim();
+                    let t = child.textContent ? child.textContent.trim() : '';
                     if (t) text.push(t);
                 } else if (child.nodeType === 1) {
                     text = text.concat(getTextFromNode(child));
@@ -80,6 +59,31 @@ GET_TEXT_JS = """
             return text;
         }
         return getTextFromNode(document.body);
+    }
+"""
+
+SHADOW_CLICK_JS = """
+    () => {
+        function findAndClick(root) {
+            try {
+                let children = root.querySelectorAll ? Array.from(root.querySelectorAll('*')) : [];
+                for (let el of children) {
+                    try {
+                        if (el.shadowRoot) {
+                            let result = findAndClick(el.shadowRoot);
+                            if (result) return true;
+                        }
+                        let text = el.textContent ? el.textContent.trim() : '';
+                        if (text.toLowerCase().includes('to hit a home run') && text.length < 40) {
+                            el.click();
+                            return true;
+                        }
+                    } catch(e) {}
+                }
+            } catch(e) {}
+            return false;
+        }
+        return findAndClick(document.body);
     }
 """
 
@@ -170,33 +174,13 @@ async def scrape_player_props(page):
     await page.goto(PLAYER_PROPS_URL, wait_until="domcontentloaded", timeout=60000)
     await asyncio.sleep(15)
 
-    print("Attempting shadow DOM click on To Hit A Home Run...")
-    clicked = await page.evaluate(SHADOW_CLICK_JS, "To Hit A Home Run")
-    if clicked:
-        print("Shadow DOM click succeeded")
-    else:
-        print("Shadow DOM click failed — trying partial match...")
-        clicked = await page.evaluate("""
-            () => {
-                function findAndClick(root) {
-                    let children = root.querySelectorAll ? Array.from(root.querySelectorAll('*')) : [];
-                    for (let el of children) {
-                        if (el.shadowRoot) {
-                            let result = findAndClick(el.shadowRoot);
-                            if (result) return true;
-                        }
-                        let text = el.textContent.trim().toLowerCase();
-                        if (text.includes('to hit a home run') && text.length < 30) {
-                            el.click();
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                return findAndClick(document.body);
-            }
-        """)
-        print(f"Partial match click: {clicked}")
+    print("Attempting shadow DOM click...")
+    try:
+        clicked = await page.evaluate(SHADOW_CLICK_JS)
+        print(f"Shadow DOM click result: {clicked}")
+    except Exception as e:
+        print(f"Shadow DOM click error: {e}")
+        clicked = False
 
     await asyncio.sleep(8)
 
