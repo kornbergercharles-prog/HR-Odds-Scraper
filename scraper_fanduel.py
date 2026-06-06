@@ -107,7 +107,7 @@ async def scrape_parlay_builder(page):
 
     page_text = await page.inner_text("body")
     if "parlay builder" not in page_text.lower():
-        print("Parlay Builder section not found on page — skipping")
+        print("Parlay Builder section not found — skipping")
         return []
 
     try:
@@ -145,16 +145,32 @@ async def scrape_parlay_builder(page):
 async def scrape_player_props(page):
     print("Trying Player Props tab...")
     await page.goto(PLAYER_PROPS_URL, wait_until="domcontentloaded", timeout=60000)
-    await asyncio.sleep(10)
+    await asyncio.sleep(15)
 
-    try:
-        hr = page.get_by_text("To Hit a Home Run", exact=False)
-        await hr.first.click()
-        print("Clicked HR section in Player Props")
-    except Exception as e:
-        print(f"Click failed: {e}")
+    page_text = await page.inner_text("body")
+    print(f"Page loaded. Looking for HR section...")
 
-    await asyncio.sleep(5)
+    hr_clicked = False
+    click_attempts = [
+        "To Hit a Home Run",
+        "Home Run",
+        "Home Runs",
+    ]
+
+    for attempt_text in click_attempts:
+        try:
+            el = page.get_by_text(attempt_text, exact=False).first
+            await el.wait_for(timeout=5000)
+            await el.click()
+            print(f"Clicked: '{attempt_text}'")
+            hr_clicked = True
+            await asyncio.sleep(5)
+            break
+        except Exception:
+            print(f"Could not click: '{attempt_text}'")
+
+    if not hr_clicked:
+        print("Could not click HR section — extracting full page anyway")
 
     clicked = 0
     while True:
@@ -170,7 +186,13 @@ async def scrape_player_props(page):
 
     await asyncio.sleep(5)
     all_text = await get_page_text(page)
-    return extract_odds_from_text(all_text)
+    results = extract_odds_from_text(all_text)
+
+    if looks_like_hr_odds(results):
+        return results
+
+    print("Player Props results don't look like HR odds either")
+    return results
 
 async def capture():
     async with async_playwright() as p:
