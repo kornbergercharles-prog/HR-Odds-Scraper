@@ -23,56 +23,24 @@ def implied_prob(odds):
 def fmt_prob(val):
     return f"{val:.1%}" if val is not None else ""
 
-def get_player_name_dk(m):
-    if not isinstance(m, dict):
-        return None
-    if m.get("label") == "1+":
-        participants = m.get("participants")
-        if isinstance(participants, list) and participants:
-            name = participants[0].get("name")
-            if name:
-                return name
-    if "name" in m:
-        return m.get("name")
-    if "displayName" in m:
-        return m.get("displayName")
-    return None
-
 def parse_dk():
-    with open("all_responses.json", "r", encoding="utf-8") as f:
-        raw = json.load(f)
-    rows = []
-    def extract(market_list):
-        for m in market_list:
-            try:
-                if not isinstance(m, dict):
-                    continue
-                if m.get("label") != "1+":
-                    continue
-                player = get_player_name_dk(m)
-                if not player:
-                    continue
-                rows.append({
-                    "player": player,
-                    "dk_odds": m.get("displayOdds", {}).get("american"),
-                })
-            except Exception:
-                continue
-    def find(obj):
-        if isinstance(obj, list):
-            extract(obj)
-        elif isinstance(obj, dict):
-            for v in obj.values():
-                if isinstance(v, (dict, list)):
-                    find(v)
-    find(raw)
-    if len(rows) == 0:
+    try:
+        with open("all_responses.json", "r", encoding="utf-8") as f:
+            raw = json.load(f)
+        if not raw:
+            print("DraftKings: no data")
+            return pd.DataFrame(columns=["player", "dk_odds"])
+        df = pd.DataFrame(raw)
+        if "player" not in df.columns or "dk_odds" not in df.columns:
+            print("DraftKings: missing columns")
+            return pd.DataFrame(columns=["player", "dk_odds"])
+        df = df.dropna(subset=["player", "dk_odds"])
+        df = df.drop_duplicates(subset=["player"])
+        print(f"DraftKings players: {len(df)}")
+        return df
+    except Exception as e:
+        print(f"DraftKings parse error: {e}")
         return pd.DataFrame(columns=["player", "dk_odds"])
-    df = pd.DataFrame(rows)
-    df = df.dropna(subset=["player", "dk_odds"])
-    df = df.drop_duplicates(subset=["player"])
-    print(f"DraftKings players: {len(df)}")
-    return df
 
 def parse_fanduel():
     try:
