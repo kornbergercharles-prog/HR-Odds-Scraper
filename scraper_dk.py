@@ -1,31 +1,36 @@
-import requests
 import json
+import asyncio
+from playwright.async_api import async_playwright
 
 print("DOWNLOADING LIVE DRAFTKINGS DATA...")
 
-url = "https://sportsbook-nash.draftkings.com/sites/US-NY-SB/api/sportscontent/controldata/league/leagueSubcategory/v1/markets"
+DK_URL = "https://sportsbook.draftkings.com/leagues/baseball/mlb?category=player-props&subcategory=home-runs"
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://sportsbook.draftkings.com/",
-    "Origin": "https://sportsbook.draftkings.com",
-}
+async def capture():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            )
+        )
+        page = await context.new_page()
 
-try:
-    response = requests.get(url, headers=headers, timeout=30)
-    print(f"STATUS CODE: {response.status_code}")
-    if response.status_code == 200:
-        data = response.json()
-        with open("all_responses.json", "w", encoding="utf-8") as f:
-            json.dump(data, f)
-        print("DraftKings data saved")
-    else:
-        print(f"DraftKings blocked — saving empty data")
-        with open("all_responses.json", "w", encoding="utf-8") as f:
-            json.dump({}, f)
-except Exception as e:
-    print(f"Error: {e}")
+        print("Loading DraftKings...")
+        await page.goto(DK_URL, wait_until="domcontentloaded", timeout=60000)
+        await asyncio.sleep(10)
+
+        page_text = await page.inner_text("body")
+        print(f"Page text sample:\n{page_text[:2000]}")
+
+        await page.screenshot(path="dk_screenshot.png")
+        print("Screenshot saved")
+
+        await browser.close()
+
     with open("all_responses.json", "w", encoding="utf-8") as f:
         json.dump({}, f)
+
+asyncio.run(capture())
