@@ -30,13 +30,13 @@ jobs:
           pip install requests pandas openpyxl playwright beautifulsoup4
           playwright install chromium
       
-      - name: Install xvfb (virtual display)
+      - name: Install xvfb
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb
       
-      - name: Run DraftKings scraper
-        run: python scraper_dk.py
+      - name: Run DraftKings scraper with virtual display
+        run: xvfb-run -a python scraper_dk.py
       
       - name: Run FanDuel scraper with virtual display
         run: xvfb-run -a python scraper_fanduel.py
@@ -55,8 +55,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add hr_odds.xlsx
-          git add fanduel_responses.json
-          git add all_responses.json
+          git add hr_odds.xlsx fanduel_responses.json all_responses.json
+          git add -f dk_screenshot.png || true
+          git add -f fanduel_screenshot.png || true
           git commit -m "Update odds files - $(date)" || echo "No changes to commit"
           git push
