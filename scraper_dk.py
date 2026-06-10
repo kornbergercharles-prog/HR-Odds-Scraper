@@ -6,6 +6,38 @@ print("DOWNLOADING LIVE DRAFTKINGS DATA...")
 
 DK_URL = "https://sportsbook.draftkings.com/leagues/baseball/mlb?category=player-props&subcategory=home-runs"
 
+SKIP_NAMES = {
+    'BATTER PROPS', 'PITCHER PROPS', 'GAME LINES', 'ACES', 'QUICK HITS',
+    'SPECIALS', 'SERIES PROPS', 'Home Runs', 'Hits', 'Total Bases',
+    'RBIs', 'Runs Scored', 'Stolen Bases', 'Sign Up or Log In',
+    'DraftKings', 'My Bets', 'Live In-Game', 'Rewards', 'How to Bet',
+    'More', 'VIP', 'MLB', 'NFL', 'NBA', 'NHL', 'Futures', 'Games',
+    'Quick SGP', 'Specials', 'BET SLIP', 'YOUR PICKS WILL SHOW UP HERE',
+    'Today', 'Tomorrow', 'Sportsbook', 'Baseball Odds', 'MLB Odds',
+    'Play FREE Big League Draw', 'Opt In', 'Join Now', 'Log In',
+}
+
+GET_TEXT_JS = """
+    () => {
+        function getTextFromNode(node) {
+            let text = [];
+            if (node.shadowRoot) {
+                text = text.concat(getTextFromNode(node.shadowRoot));
+            }
+            for (let child of node.childNodes) {
+                if (child.nodeType === 3) {
+                    let t = child.textContent ? child.textContent.trim() : '';
+                    if (t) text.push(t);
+                } else if (child.nodeType === 1) {
+                    text = text.concat(getTextFromNode(child));
+                }
+            }
+            return text;
+        }
+        return getTextFromNode(document.body);
+    }
+"""
+
 async def capture():
     results = []
 
@@ -44,37 +76,7 @@ async def capture():
         print("Screenshot saved")
 
         print("Extracting odds...")
-        js_code = """
-        () => {
-            function getTextFromNode(node) {
-                let text = [];
-                if (node.shadowRoot) {
-                    text = text.concat(getTextFromNode(node.shadowRoot));
-                }
-                for (let child of node.childNodes) {
-                    if (child.nodeType === 3) {
-                        let t = child.textContent ? child.textContent.trim() : '';
-                        if (t) text.push(t);
-                    } else if (child.nodeType === 1) {
-                        text = text.concat(getTextFromNode(child));
-                    }
-                }
-                return text;
-            }
-            return getTextFromNode(document.body);
-        }
-        """
-
-        all_text = await page.evaluate(js_code)
-
-        skip_names = new Set([
-            'BATTER PROPS', 'PITCHER PROPS', 'GAME LINES', 'ACES', 'QUICK HITS',
-            'SPECIALS', 'SERIES PROPS', 'Home Runs', 'Hits', 'Total Bases',
-            'RBIs', 'Runs Scored', 'Stolen Bases', 'Sign Up or Log In',
-            'DraftKings', 'My Bets', 'Live In-Game', 'Rewards', 'How to Bet',
-            'More', 'VIP', 'MLB', 'NFL', 'NBA', 'NHL', 'Futures', 'Games',
-            'Quick SGP', 'Specials', 'BET SLIP', 'YOUR PICKS WILL SHOW UP HERE'
-        ])
+        all_text = await page.evaluate(GET_TEXT_JS)
 
         last_name = None
         for t in all_text:
@@ -87,7 +89,7 @@ async def capture():
                 len(t) < 40 and
                 t[0].isupper() and
                 ' ' in t and
-                t not in skip_names
+                t not in SKIP_NAMES
             )
             if is_name:
                 last_name = t
