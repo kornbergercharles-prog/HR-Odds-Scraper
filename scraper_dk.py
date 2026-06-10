@@ -6,17 +6,6 @@ print("DOWNLOADING LIVE DRAFTKINGS DATA...")
 
 DK_URL = "https://sportsbook.draftkings.com/leagues/baseball/mlb?category=player-props&subcategory=home-runs"
 
-SKIP_NAMES = {
-    'BATTER PROPS', 'PITCHER PROPS', 'GAME LINES', 'ACES', 'QUICK HITS',
-    'SPECIALS', 'SERIES PROPS', 'Home Runs', 'Hits', 'Total Bases',
-    'RBIs', 'Runs Scored', 'Stolen Bases', 'Sign Up or Log In',
-    'DraftKings', 'My Bets', 'Live In-Game', 'Rewards', 'How to Bet',
-    'More', 'VIP', 'MLB', 'NFL', 'NBA', 'NHL', 'Futures', 'Games',
-    'Quick SGP', 'Specials', 'BET SLIP', 'YOUR PICKS WILL SHOW UP HERE',
-    'Today', 'Tomorrow', 'Sportsbook', 'Baseball Odds', 'MLB Odds',
-    'Play FREE Big League Draw', 'Opt In', 'Join Now', 'Log In',
-}
-
 GET_TEXT_JS = """
     () => {
         function getTextFromNode(node) {
@@ -38,6 +27,21 @@ GET_TEXT_JS = """
     }
 """
 
+SKIP_NAMES = {
+    'batter props', 'pitcher props', 'game lines', 'aces', 'quick hits',
+    'specials', 'series props', 'home runs', 'hits', 'total bases',
+    'rbis', 'runs scored', 'stolen bases', 'sign up or log in',
+    'draftkings', 'my bets', 'live in-game', 'rewards', 'how to bet',
+    'more', 'vip', 'mlb', 'nfl', 'nba', 'nhl', 'futures', 'games',
+    'quick sgp', 'bet slip', 'your picks will show up here', 'today',
+    'tomorrow', 'sportsbook', 'baseball odds', 'mlb odds',
+    'play free big league draw', 'opt in', 'join now', 'log in',
+    'hits + runs + rbis', 'extra base hits', 'live batter props',
+    'live pitcher props', 'at', 'sgp', 'more bets', 'draftkings social',
+    'you must be logged in to view this content', 'nhl', 'wnba',
+    'college baseball', 'boxing', 'popular', 'sport teams', 'a-z sports',
+}
+
 async def capture():
     results = []
 
@@ -56,50 +60,70 @@ async def capture():
         await page.goto(DK_URL, wait_until="domcontentloaded", timeout=60000)
         await asyncio.sleep(8)
 
-        print("Clicking Batter Props tab...")
+        # Click Batter Props tab
         try:
             await page.click("text=BATTER PROPS")
             await asyncio.sleep(3)
             print("Clicked Batter Props")
         except Exception as e:
-            print(f"Could not click Batter Props: {e}")
+            print(f"Batter Props click failed: {e}")
 
-        print("Looking for Home Runs section...")
+        # Click Home Runs subcategory
         try:
-            await page.click("text=Home Runs")
+            await page.click("text=HOME RUNS")
             await asyncio.sleep(3)
             print("Clicked Home Runs")
         except Exception as e:
-            print(f"Could not click Home Runs: {e}")
+            print(f"Home Runs click failed: {e}")
 
-        await page.screenshot(path="dk_screenshot.png")
-        print("Screenshot saved")
+        # Scroll down to load all players
+        print("Scrolling to load all players...")
+        for i in range(10):
+            await page.keyboard.press("End")
+            await asyncio.sleep(1)
+
+        await asyncio.sleep(3)
 
         print("Extracting odds...")
         all_text = await page.evaluate(GET_TEXT_JS)
 
+        # The page shows: PlayerName, HR: N, [icon], 1+, +ODDS, 2+, >
+        # We look for "1+" as the trigger then grab the next odds value
+        found_one_plus = False
         last_name = None
-        for t in all_text:
+
+        for i, t in enumerate(all_text):
             t = t.strip()
             if not t:
                 continue
-            is_odds = (t.startswith('+') or t.startswith('-')) and t[1:].isdigit()
+
+            # Detect player name — comes before "1+" marker
             is_name = (
                 len(t) > 4 and
                 len(t) < 40 and
                 t[0].isupper() and
                 ' ' in t and
-                t not in SKIP_NAMES
+                t.lower() not in SKIP_NAMES and
+                not t.startswith('HR:') and
+                not t.startswith('Today') and
+                not t.startswith('Tomorrow')
             )
+
+            is_odds = (t.startswith('+') or t.startswith('-')) and t[1:].isdigit()
+
             if is_name:
                 last_name = t
-            elif is_odds and last_name:
+                found_one_plus = False
+            elif t == '1+':
+                found_one_plus = True
+            elif is_odds and found_one_plus and last_name:
                 results.append({'player': last_name, 'dk_odds': t})
+                found_one_plus = False
                 last_name = None
 
         print(f"Found {len(results)} players")
         if results:
-            print(f"Sample: {results[:3]}")
+            print(f"Sample: {results[:5]}")
 
         await browser.close()
 
