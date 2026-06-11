@@ -46,7 +46,6 @@ SKIP_NAMES = {
     "more bets", "more wagers", "run line", "total", "moneyline",
     "bot 1st", "bot 2nd", "bot 3rd", "bot 4th", "bot 5th", "bot 6th",
     "bot 7th", "bot 8th", "bot 9th", "top 1st", "top 2nd", "top 3rd",
-    "p:", "ab:", "at"
 }
 
 GET_TEXT_JS = """
@@ -69,28 +68,6 @@ GET_TEXT_JS = """
         return getTextFromNode(document.body);
     }
 """
-
-def extract_odds_from_text(all_text):
-    results = []
-    last_name = None
-    for t in all_text:
-        t = t.strip()
-        if not t:
-            continue
-        is_odds = (t.startswith("+") or t.startswith("-")) and t[1:].isdigit()
-        is_name = (
-            len(t) > 4 and
-            len(t) < 40 and
-            t[0].isupper() and
-            " " in t and
-            t.lower() not in SKIP_NAMES
-        )
-        if is_name:
-            last_name = t
-        elif is_odds and last_name:
-            results.append({"player": last_name, "fd_odds": t})
-            last_name = None
-    return results
 
 def deduplicate(results):
     seen = set()
@@ -144,7 +121,24 @@ async def scrape_parlay_builder(page):
 
     await asyncio.sleep(5)
     all_text = await page.evaluate(GET_TEXT_JS)
-    results = extract_odds_from_text(all_text)
+
+    results = []
+    last_name = None
+    for t in all_text:
+        t = t.strip()
+        if not t:
+            continue
+        is_odds = (t.startswith("+") or t.startswith("-")) and t[1:].isdigit()
+        is_name = (
+            len(t) > 4 and len(t) < 40 and
+            t[0].isupper() and " " in t and
+            t.lower() not in SKIP_NAMES
+        )
+        if is_name:
+            last_name = t
+        elif is_odds and last_name:
+            results.append({"player": last_name, "fd_odds": t})
+            last_name = None
 
     if not looks_like_hr_odds(results):
         print("Results don't look like HR odds — falling back")
@@ -157,21 +151,98 @@ async def scrape_homepage_mlb(page):
     await page.goto(HOMEPAGE_MLB_URL, wait_until="domcontentloaded", timeout=60000)
     await asyncio.sleep(12)
 
-    page_text = await page.inner_text("body")
-    print(f"Page loaded. HR section present: {'to hit a home run parlay builder' in page_text.lower()}")
-
-    # Scroll down to load all content including HR section
-    print("Scrolling to load all content...")
-    for i in range(20):
+    # Scroll down slowly to load all content
+    print("Scrolling to load content...")
+    for i in range(25):
         await page.keyboard.press("End")
-        await asyncio.sleep(0.8)
+        await asyncio.sleep(1)
 
     await asyncio.sleep(3)
 
-    all_text = await page.evaluate(GET_TEXT_JS)
-    results = extract_odds_from_text(all_text)
-    print(f"MLB page found {len(results)} players")
+    # Take screenshot to see what's on the page
+    await page.screenshot(path="fanduel_screenshot.png", full_page=False)
+    print("Screenshot saved")
 
+    page_text = await page.inner_text("body")
+    print(f"HR section found: {'to hit a home run parlay builder' in page_text.lower()}")
+    print(f"Page text sample (first 1000 chars):\n{page_text[:1000]}")
+
+    # Extract text between "To Hit a Home Run Parlay Builder" and next section
+    results = []
+    try:
+        hr_section_text = await page.evaluate("""
+            () => {
+                function getTextFromNode(node) {
+                    let text = [];
+                    if (node.shadowRoot) {
+                        text = text.concat(getTextFromNode(node.shadowRoot));
+                    }
+                    for (let child of node.childNodes) {
+                        if (child.nodeType === 3) {
+                            let t = child.textContent ? child.textContent.trim() : '';
+                            if (t) text.push(t);
+                        } else if (child.nodeType === 1) {
+                            text = text.concat(getTextFromNode(child));
+                        }
+                    }
+                    return text;
+                }
+                let allText = getTextFromNode(document.body);
+                
+                // Find start index after "To Hit a Home Run Parlay Builder"
+                let startIdx = -1;
+                for (let i = 0; i < allText.length; i++) {
+                    if (allText[i].toLowerCase().includes('to hit a home run parlay builder')) {
+                        startIdx = i + 1;
+                        break;
+                    }
+                }
+                
+                if (startIdx === -1) return [];
+                
+                // Find end index — stop at next major section
+                let endIdx = allText.length;
+                let stopWords = ['nhl', 'nba', 'nfl', 'wnba', 'soccer', 'tennis', 'golf', 
+                                 'to record a hit parlay builder', 'to record an rbi'];
+                for (let i = startIdx; i < allText.length; i++) {
+                    let lower = allText[i].toLowerCase();
+                    for (let stop of stopWords) {
+                        if (lower === stop) {
+                            endIdx = i;
+                            break;
+                        }
+                    }
+                    if (endIdx !== allText.length) break;
+                }
+                
+                return allText.slice(startIdx, endIdx);
+            }
+        """)
+
+        print(f"HR section text items: {len(hr_section_text)}")
+        print(f"HR section sample: {hr_section_text[:20]}")
+
+        last_name = None
+        for t in hr_section_text:
+            t = t.strip()
+            if not t:
+                continue
+            is_odds = (t.startswith("+") or t.startswith("-")) and t[1:].isdigit()
+            is_name = (
+                len(t) > 4 and len(t) < 40 and
+                t[0].isupper() and " " in t and
+                t.lower() not in SKIP_NAMES
+            )
+            if is_name:
+                last_name = t
+            elif is_odds and last_name:
+                results.append({"player": last_name, "fd_odds": t})
+                last_name = None
+
+    except Exception as e:
+        print(f"Extraction error: {e}")
+
+    print(f"MLB page found {len(results)} players")
     if results:
         print(f"Sample: {results[:3]}")
 
@@ -189,10 +260,8 @@ async def capture():
         )
         page = await context.new_page()
 
-        # Try 1: Parlay Builder page (original)
         results = await scrape_parlay_builder(page)
 
-        # Try 2: FanDuel MLB page
         if not results:
             print("Falling back to FanDuel MLB page...")
             results = await scrape_homepage_mlb(page)
