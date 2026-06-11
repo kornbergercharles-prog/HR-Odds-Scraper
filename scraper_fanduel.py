@@ -5,7 +5,7 @@ from playwright.async_api import async_playwright
 print("DOWNLOADING LIVE FANDUEL DATA...")
 
 TARGET_URL = "https://sportsbook.fanduel.com/navigation/mlb?tab=parlay-builder"
-HOMEPAGE_MLB_URL = "https://sportsbook.fanduel.com"
+HOMEPAGE_MLB_URL = "https://sportsbook.fanduel.com/baseball/mlb"
 
 SKIP_NAMES = {
     "fanduel sportsbook", "my bets", "log in", "join now", "live now",
@@ -40,11 +40,13 @@ SKIP_NAMES = {
     "to record a hit", "to record an rbi", "daily dinger",
     "play free for a shot at a profit boost", "nba", "nhl", "nfl", "wnba",
     "world cup", "ncaaf", "upcoming races", "ufc", "home", "offers",
-    "fantasy", "racebook", "tv+", "faceoff", "more wagers",
+    "fantasy", "racebook", "tv+", "faceoff",
     "listed player must be included in the starting lineup for bets to stand",
-    "to hit a home run", "sgp", "live", "bot 3rd", "bot 2nd", "bot 6th",
-    "atlanta braves", "chicago white sox", "texas rangers", "kansas city royals",
-    "if you or someone you know has a gambling problem"
+    "sgp", "live", "if you or someone you know has a gambling problem",
+    "more bets", "more wagers", "run line", "total", "moneyline",
+    "bot 1st", "bot 2nd", "bot 3rd", "bot 4th", "bot 5th", "bot 6th",
+    "bot 7th", "bot 8th", "bot 9th", "top 1st", "top 2nd", "top 3rd",
+    "p:", "ab:", "at"
 }
 
 GET_TEXT_JS = """
@@ -151,44 +153,24 @@ async def scrape_parlay_builder(page):
     return results
 
 async def scrape_homepage_mlb(page):
-    print("Trying FanDuel homepage MLB tab...")
+    print("Trying FanDuel MLB page directly...")
     await page.goto(HOMEPAGE_MLB_URL, wait_until="domcontentloaded", timeout=60000)
-    await asyncio.sleep(8)
+    await asyncio.sleep(12)
 
-    # Click MLB tab
-    try:
-        await page.click("text=MLB")
-        print("Clicked MLB tab")
-        await asyncio.sleep(5)
-    except Exception as e:
-        print(f"MLB tab click failed: {e}")
+    page_text = await page.inner_text("body")
+    print(f"Page loaded. HR section present: {'to hit a home run parlay builder' in page_text.lower()}")
 
-    # Scroll down to find the HR Parlay Builder section
-    print("Scrolling to find HR Parlay Builder section...")
-    for i in range(15):
+    # Scroll down to load all content including HR section
+    print("Scrolling to load all content...")
+    for i in range(20):
         await page.keyboard.press("End")
-        await asyncio.sleep(1)
-
-        page_text = await page.inner_text("body")
-        if "to hit a home run parlay builder" in page_text.lower():
-            print("Found HR Parlay Builder section")
-            await asyncio.sleep(3)
-            break
-
-    # Click "More wagers" if present to expand
-    try:
-        more_wagers = page.get_by_text("More wagers", exact=False).first
-        await more_wagers.wait_for(timeout=3000)
-        await more_wagers.click()
-        print("Clicked More wagers")
-        await asyncio.sleep(3)
-    except Exception:
-        pass
+        await asyncio.sleep(0.8)
 
     await asyncio.sleep(3)
+
     all_text = await page.evaluate(GET_TEXT_JS)
     results = extract_odds_from_text(all_text)
-    print(f"Homepage MLB found {len(results)} players")
+    print(f"MLB page found {len(results)} players")
 
     if results:
         print(f"Sample: {results[:3]}")
@@ -210,9 +192,9 @@ async def capture():
         # Try 1: Parlay Builder page (original)
         results = await scrape_parlay_builder(page)
 
-        # Try 2: Homepage MLB tab HR section
+        # Try 2: FanDuel MLB page
         if not results:
-            print("Falling back to homepage MLB tab...")
+            print("Falling back to FanDuel MLB page...")
             results = await scrape_homepage_mlb(page)
 
         await browser.close()
