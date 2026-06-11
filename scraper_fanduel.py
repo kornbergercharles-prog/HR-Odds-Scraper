@@ -5,7 +5,7 @@ from playwright.async_api import async_playwright
 print("DOWNLOADING LIVE FANDUEL DATA...")
 
 TARGET_URL = "https://sportsbook.fanduel.com/navigation/mlb?tab=parlay-builder"
-PLAYER_PROPS_URL = "https://sportsbook.fanduel.com/navigation/mlb?tab=player-props"
+HOMEPAGE_MLB_URL = "https://sportsbook.fanduel.com"
 
 SKIP_NAMES = {
     "fanduel sportsbook", "my bets", "log in", "join now", "live now",
@@ -38,7 +38,13 @@ SKIP_NAMES = {
     "rugby league", "rugby union", "soccer", "tennis",
     "awards", "playoffs", "player props", "mlb player props",
     "to record a hit", "to record an rbi", "daily dinger",
-    "play free for a shot at a profit boost"
+    "play free for a shot at a profit boost", "nba", "nhl", "nfl", "wnba",
+    "world cup", "ncaaf", "upcoming races", "ufc", "home", "offers",
+    "fantasy", "racebook", "tv+", "faceoff", "more wagers",
+    "listed player must be included in the starting lineup for bets to stand",
+    "to hit a home run", "sgp", "live", "bot 3rd", "bot 2nd", "bot 6th",
+    "atlanta braves", "chicago white sox", "texas rangers", "kansas city royals",
+    "if you or someone you know has a gambling problem"
 }
 
 GET_TEXT_JS = """
@@ -59,31 +65,6 @@ GET_TEXT_JS = """
             return text;
         }
         return getTextFromNode(document.body);
-    }
-"""
-
-SHADOW_CLICK_JS = """
-    () => {
-        function findAndClick(root) {
-            try {
-                let children = root.querySelectorAll ? Array.from(root.querySelectorAll('*')) : [];
-                for (let el of children) {
-                    try {
-                        if (el.shadowRoot) {
-                            let result = findAndClick(el.shadowRoot);
-                            if (result) return true;
-                        }
-                        let text = el.textContent ? el.textContent.trim() : '';
-                        if (text.toLowerCase().includes('to hit a home run') && text.length < 40) {
-                            el.click();
-                            return true;
-                        }
-                    } catch(e) {}
-                }
-            } catch(e) {}
-            return false;
-        }
-        return findAndClick(document.body);
     }
 """
 
@@ -169,24 +150,45 @@ async def scrape_parlay_builder(page):
 
     return results
 
-async def scrape_player_props(page):
-    print("Trying Player Props — expanding To Hit A Home Run dropdown...")
-    await page.goto(PLAYER_PROPS_URL, wait_until="domcontentloaded", timeout=60000)
-    await asyncio.sleep(15)
-
-    print("Attempting shadow DOM click...")
-    try:
-        clicked = await page.evaluate(SHADOW_CLICK_JS)
-        print(f"Shadow DOM click result: {clicked}")
-    except Exception as e:
-        print(f"Shadow DOM click error: {e}")
-        clicked = False
-
+async def scrape_homepage_mlb(page):
+    print("Trying FanDuel homepage MLB tab...")
+    await page.goto(HOMEPAGE_MLB_URL, wait_until="domcontentloaded", timeout=60000)
     await asyncio.sleep(8)
 
+    # Click MLB tab
+    try:
+        await page.click("text=MLB")
+        print("Clicked MLB tab")
+        await asyncio.sleep(5)
+    except Exception as e:
+        print(f"MLB tab click failed: {e}")
+
+    # Scroll down to find the HR Parlay Builder section
+    print("Scrolling to find HR Parlay Builder section...")
+    for i in range(15):
+        await page.keyboard.press("End")
+        await asyncio.sleep(1)
+
+        page_text = await page.inner_text("body")
+        if "to hit a home run parlay builder" in page_text.lower():
+            print("Found HR Parlay Builder section")
+            await asyncio.sleep(3)
+            break
+
+    # Click "More wagers" if present to expand
+    try:
+        more_wagers = page.get_by_text("More wagers", exact=False).first
+        await more_wagers.wait_for(timeout=3000)
+        await more_wagers.click()
+        print("Clicked More wagers")
+        await asyncio.sleep(3)
+    except Exception:
+        pass
+
+    await asyncio.sleep(3)
     all_text = await page.evaluate(GET_TEXT_JS)
     results = extract_odds_from_text(all_text)
-    print(f"Player Props found {len(results)} players")
+    print(f"Homepage MLB found {len(results)} players")
 
     if results:
         print(f"Sample: {results[:3]}")
@@ -205,11 +207,13 @@ async def capture():
         )
         page = await context.new_page()
 
+        # Try 1: Parlay Builder page (original)
         results = await scrape_parlay_builder(page)
 
+        # Try 2: Homepage MLB tab HR section
         if not results:
-            print("Falling back to Player Props...")
-            results = await scrape_player_props(page)
+            print("Falling back to homepage MLB tab...")
+            results = await scrape_homepage_mlb(page)
 
         await browser.close()
 
