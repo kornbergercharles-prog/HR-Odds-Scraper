@@ -4,7 +4,7 @@ from playwright.async_api import async_playwright
 
 print("DOWNLOADING LIVE DRAFTKINGS DATA...")
 
-DK_URL = "https://sportsbook.draftkings.com/leagues/baseball/mlb?category=player-props&subcategory=home-runs"
+DK_URL = "https://sportsbook.draftkings.com/leagues/baseball/mlb?category=games&subcategory=batter&nav_1=home-runs"
 
 GET_TEXT_JS = """
     () => {
@@ -28,7 +28,7 @@ GET_TEXT_JS = """
 """
 
 SKIP_NAMES = {
-    'batter props', 'pitcher props', 'game lines', 'aces', 'quick hits',
+    'batter', 'pitcher', 'game lines', 'aces', 'quick hits',
     'specials', 'series props', 'home runs', 'hits', 'total bases',
     'rbis', 'runs scored', 'stolen bases', 'sign up or log in',
     'draftkings', 'my bets', 'live in-game', 'rewards', 'how to bet',
@@ -40,6 +40,10 @@ SKIP_NAMES = {
     'live pitcher props', 'at', 'sgp', 'more bets', 'draftkings social',
     'you must be logged in to view this content', 'wnba',
     'college baseball', 'boxing', 'popular', 'sport teams', 'a-z sports',
+    'either batter hr', 'combined hits', 'standings', 'pools', 'social',
+    'world cup 2026', 'travelers championship', 'ufc', 'nascar cup series',
+    'south korean kbo', 'italian open', 'wimbledon', 'japan npb',
+    'fivb nations league', 'wta', 'get a profit boost', 'join the mlb dugout',
 }
 
 async def capture():
@@ -60,22 +64,28 @@ async def capture():
         await page.goto(DK_URL, wait_until="domcontentloaded", timeout=60000)
         await asyncio.sleep(10)
 
-        # Try clicking tabs but don't fail if they're not found
-        for label in ["BATTER PROPS", "Batter Props", "HOME RUNS", "Home Runs"]:
-            try:
-                await page.click(f"text={label}", timeout=5000)
-                await asyncio.sleep(2)
-                print(f"Clicked {label}")
-            except:
-                pass
+        # Try clicking BATTER tab
+        try:
+            await page.click("text=BATTER", timeout=5000)
+            await asyncio.sleep(2)
+            print("Clicked BATTER tab")
+        except:
+            print("BATTER tab not found — continuing")
+
+        # Try clicking HOME RUNS tab
+        try:
+            await page.click("text=HOME RUNS", timeout=5000)
+            await asyncio.sleep(2)
+            print("Clicked HOME RUNS tab")
+        except:
+            print("HOME RUNS tab not found — continuing")
 
         print("Scrolling to load all players...")
-        for i in range(10):
+        for i in range(15):
             await page.keyboard.press("End")
             await asyncio.sleep(1)
 
         await asyncio.sleep(3)
-
         await page.screenshot(path="dk_screenshot.png")
         print("Screenshot saved")
 
@@ -114,7 +124,7 @@ async def capture():
 
         print(f"Found {len(results)} players")
         if results:
-            print(f"Sample: {results[:3]}")
+            print(f"Sample: {results[:5]}")
 
         await browser.close()
 
