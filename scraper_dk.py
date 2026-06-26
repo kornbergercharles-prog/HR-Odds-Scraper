@@ -38,7 +38,7 @@ SKIP_NAMES = {
     'play free big league draw', 'opt in', 'join now', 'log in',
     'hits + runs + rbis', 'extra base hits', 'live batter props',
     'live pitcher props', 'at', 'sgp', 'more bets', 'draftkings social',
-    'you must be logged in to view this content', 'nhl', 'wnba',
+    'you must be logged in to view this content', 'wnba',
     'college baseball', 'boxing', 'popular', 'sport teams', 'a-z sports',
 }
 
@@ -58,25 +58,17 @@ async def capture():
 
         print("Loading DraftKings...")
         await page.goto(DK_URL, wait_until="domcontentloaded", timeout=60000)
-        await asyncio.sleep(8)
+        await asyncio.sleep(10)
 
-        # Click Batter Props tab
-        try:
-            await page.click("text=BATTER PROPS")
-            await asyncio.sleep(3)
-            print("Clicked Batter Props")
-        except Exception as e:
-            print(f"Batter Props click failed: {e}")
+        # Try clicking tabs but don't fail if they're not found
+        for label in ["BATTER PROPS", "Batter Props", "HOME RUNS", "Home Runs"]:
+            try:
+                await page.click(f"text={label}", timeout=5000)
+                await asyncio.sleep(2)
+                print(f"Clicked {label}")
+            except:
+                pass
 
-        # Click Home Runs subcategory
-        try:
-            await page.click("text=HOME RUNS")
-            await asyncio.sleep(3)
-            print("Clicked Home Runs")
-        except Exception as e:
-            print(f"Home Runs click failed: {e}")
-
-        # Scroll down to load all players
         print("Scrolling to load all players...")
         for i in range(10):
             await page.keyboard.press("End")
@@ -84,20 +76,21 @@ async def capture():
 
         await asyncio.sleep(3)
 
+        await page.screenshot(path="dk_screenshot.png")
+        print("Screenshot saved")
+
         print("Extracting odds...")
         all_text = await page.evaluate(GET_TEXT_JS)
 
-        # The page shows: PlayerName, HR: N, [icon], 1+, +ODDS, 2+, >
-        # We look for "1+" as the trigger then grab the next odds value
         found_one_plus = False
         last_name = None
 
-        for i, t in enumerate(all_text):
+        for t in all_text:
             t = t.strip()
             if not t:
                 continue
 
-            # Detect player name — comes before "1+" marker
+            is_odds = (t.startswith('+') or t.startswith('-')) and t[1:].isdigit()
             is_name = (
                 len(t) > 4 and
                 len(t) < 40 and
@@ -108,8 +101,6 @@ async def capture():
                 not t.startswith('Today') and
                 not t.startswith('Tomorrow')
             )
-
-            is_odds = (t.startswith('+') or t.startswith('-')) and t[1:].isdigit()
 
             if is_name:
                 last_name = t
@@ -123,7 +114,7 @@ async def capture():
 
         print(f"Found {len(results)} players")
         if results:
-            print(f"Sample: {results[:5]}")
+            print(f"Sample: {results[:3]}")
 
         await browser.close()
 
