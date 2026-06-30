@@ -56,33 +56,45 @@ async def capture():
         print("Loading bet365...")
         try:
             await page.goto(BET365_URL, wait_until="domcontentloaded", timeout=60000)
+            print("Page loaded successfully")
             await asyncio.sleep(10)
         except Exception as e:
             print(f"Page load failed: {e}")
+            await page.screenshot(path="bet365_screenshot.png")
+            print("Screenshot saved despite failure")
             await browser.close()
             with open("bet365_responses.json", "w", encoding="utf-8") as f:
                 json.dump([], f)
             return
+
+        # Always take a screenshot regardless of what happens next
+        await page.screenshot(path="bet365_screenshot.png")
+        print("Screenshot saved")
 
         page_text = await page.inner_text("body")
+        print(f"Page text length: {len(page_text)}")
+        print(f"Page text sample (first 1000 chars):\n{page_text[:1000]}")
+
         if "home runs" not in page_text.lower():
-            print("Home Runs section not found — saving empty data")
+            print("'home runs' string NOT found in page text — saving empty data")
             await browser.close()
             with open("bet365_responses.json", "w", encoding="utf-8") as f:
                 json.dump([], f)
             return
 
-        print("Scrolling to load all games/players...")
+        print("'home runs' found — continuing to scroll and extract")
+
         for i in range(15):
             await page.keyboard.press("End")
             await asyncio.sleep(1)
 
         await asyncio.sleep(3)
         await page.screenshot(path="bet365_screenshot.png")
-        print("Screenshot saved")
+        print("Final screenshot saved")
 
         print("Extracting odds...")
         all_text = await page.evaluate(GET_TEXT_JS)
+        print(f"Total text nodes found: {len(all_text)}")
 
         last_name = None
         for t in all_text:
