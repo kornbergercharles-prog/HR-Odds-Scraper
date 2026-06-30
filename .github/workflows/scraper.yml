@@ -35,11 +35,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y xvfb
       
-      - name: Run DraftKings scraper with virtual display
+      - name: Run DraftKings scraper
         run: xvfb-run -a python scraper_dk.py
       
-      - name: Run FanDuel scraper with virtual display
+      - name: Run FanDuel scraper
         run: xvfb-run -a python scraper_fanduel.py
+      
+      - name: Run bet365 scraper
+        run: xvfb-run -a python scraper_bet365.py
       
       - name: Run Excel export
         run: python hr_excel.py
@@ -55,8 +58,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add hr_odds.xlsx fanduel_responses.json all_responses.json
-          git add -f dk_screenshot.png || true
-          git add -f fanduel_screenshot.png || true
+          git add hr_odds.xlsx fanduel_responses.json all_responses.json bet365_responses.json
+          git add -f dk_screenshot.png fanduel_screenshot.png bet365_screenshot.png || true
           git commit -m "Update odds files - $(date)" || echo "No changes to commit"
           git push
