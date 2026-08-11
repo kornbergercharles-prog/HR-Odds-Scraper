@@ -4,13 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       use_odds_api:
-        description: 'Include FanDuel + Bovada odds via API?'
+        description: 'Pull fresh FanDuel + Bovada odds via API?'
         required: true
         default: 'false'
         type: choice
         options:
-          - 'true'
           - 'false'
+          - 'true'
+      keep_previous_api:
+        description: 'Keep previously pulled API odds?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 permissions:
   contents: write
@@ -47,14 +55,14 @@ jobs:
       - name: Run DraftKings scraper
         run: xvfb-run -a python scraper_dk.py
       
-      - name: Run Odds API scraper
+      - name: Run Odds API scraper (fresh pull)
         if: ${{ github.event.inputs.use_odds_api == 'true' }}
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scraper_api.py
       
-      - name: Clear Odds API data if not used
-        if: ${{ github.event.inputs.use_odds_api == 'false' }}
+      - name: Clear Odds API data
+        if: ${{ github.event.inputs.use_odds_api == 'false' && github.event.inputs.keep_previous_api == 'false' }}
         run: echo "[]" > odds_api_responses.json
       
       - name: Run Excel export
