@@ -2,6 +2,15 @@ name: HR Odds Scraper
 
 on:
   workflow_dispatch:
+    inputs:
+      use_odds_api:
+        description: 'Include FanDuel + Bovada odds via API?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 permissions:
   contents: write
@@ -39,9 +48,14 @@ jobs:
         run: xvfb-run -a python scraper_dk.py
       
       - name: Run Odds API scraper
+        if: ${{ github.event.inputs.use_odds_api == 'true' }}
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scraper_api.py
+      
+      - name: Clear Odds API data if not used
+        if: ${{ github.event.inputs.use_odds_api == 'false' }}
+        run: echo "[]" > odds_api_responses.json
       
       - name: Run Excel export
         run: python hr_excel.py
