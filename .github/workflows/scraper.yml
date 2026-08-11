@@ -41,6 +41,11 @@ jobs:
       - name: Run FanDuel scraper
         run: xvfb-run -a python scraper_fanduel.py
       
+      - name: Run Odds API scraper
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python scraper_api.py
+      
       - name: Run Excel export
         run: python hr_excel.py
       
@@ -55,7 +60,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add hr_odds.xlsx fanduel_responses.json all_responses.json
+          git add hr_odds.xlsx all_responses.json fanduel_responses.json odds_api_responses.json
           git add -f dk_screenshot.png fanduel_screenshot.png || true
           git commit -m "Update odds files - $(date)" || echo "No changes to commit"
           git push
