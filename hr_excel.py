@@ -30,7 +30,6 @@ def fmt_odds(val):
         return "—"
 
 def avg_prob_to_odds(prob):
-    """Convert average implied probability back to American odds format"""
     try:
         if prob is None or prob <= 0 or prob >= 1:
             return "—"
@@ -42,7 +41,6 @@ def avg_prob_to_odds(prob):
     except:
         return "—"
 
-# Parse DraftKings
 def parse_dk():
     try:
         with open("all_responses.json", "r", encoding="utf-8") as f:
@@ -62,10 +60,9 @@ def parse_dk():
         print(f"DraftKings parse error: {e}")
         return pd.DataFrame(columns=["player", "dk_odds"])
 
-# Parse FanDuel + Bovada from Odds API
 def parse_odds_api():
     try:
-        with open("odds_api_responses.json", "r", encoding="utf-8") as f:
+        with open("odds_api_responses_active.json", "r", encoding="utf-8") as f:
             raw = json.load(f)
         if not raw:
             print("Odds API: no data")
@@ -88,7 +85,6 @@ def parse_odds_api():
         print(f"Odds API parse error: {e}")
         return pd.DataFrame(columns=["player", "fd_odds", "bovada_odds"])
 
-# Read watchlist
 with open("watchlist.txt", "r", encoding="utf-8") as f:
     watchlist_raw = [line.strip() for line in f if line.strip()]
 watchlist = set(clean(x) for x in watchlist_raw)
@@ -96,7 +92,6 @@ watchlist = set(clean(x) for x in watchlist_raw)
 dk_df = parse_dk()
 api_df = parse_odds_api()
 
-# Merge all three sources
 if len(dk_df) > 0 and len(api_df) > 0:
     df = dk_df.merge(api_df, on="player", how="outer")
 elif len(dk_df) > 0:
@@ -113,7 +108,6 @@ for col in ["dk_odds", "fd_odds", "bovada_odds"]:
     if col not in df.columns:
         df[col] = None
 
-# Calculate implied probs and averages
 df["dk_implied"] = df["dk_odds"].apply(implied_prob)
 df["fd_implied"] = df["fd_odds"].apply(implied_prob)
 df["bov_implied"] = df["bovada_odds"].apply(implied_prob)
@@ -121,7 +115,6 @@ df["avg_implied"] = df[["dk_implied", "fd_implied", "bov_implied"]].mean(axis=1)
 df["avg_odds"] = df["avg_implied"].apply(avg_prob_to_odds)
 df = df.sort_values("avg_implied", ascending=False, na_position="last")
 
-# Build output — avg odds and avg prob directly after player name
 out = pd.DataFrame({
     "Player":           df["player"],
     "Avg Odds":         df["avg_odds"],
@@ -134,7 +127,6 @@ out = pd.DataFrame({
     "Bov Impl. Prob":   df["bov_implied"].apply(fmt_prob),
 })
 
-# Styling
 yellow      = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
 dark_blue   = PatternFill(start_color="1F4E79", end_color="1F4E79", fill_type="solid")
 header_font = Font(bold=True, color="FFFFFF", name="Arial", size=10)
