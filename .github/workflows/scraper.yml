@@ -79,7 +79,10 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add hr_odds.xlsx all_responses.json odds_api_responses.json
+          git add hr_odds.xlsx all_responses.json
           git add -f dk_screenshot.png || true
+          if [ "${{ github.event.inputs.use_odds_api }}" == "true" ] || [ "${{ github.event.inputs.keep_previous_api }}" == "false" ]; then
+            git add odds_api_responses.json
+          fi
           git commit -m "Update odds files - $(date)" || echo "No changes to commit"
           git push
