@@ -11,8 +11,8 @@ on:
         options:
           - 'false'
           - 'true'
-      keep_previous_api:
-        description: 'Keep previously pulled API odds?'
+      include_api_in_output:
+        description: 'Include saved API odds in this output?'
         required: true
         default: 'false'
         type: choice
@@ -61,9 +61,17 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scraper_api.py
       
-      - name: Clear Odds API data
-        if: ${{ github.event.inputs.use_odds_api == 'false' && github.event.inputs.keep_previous_api == 'false' }}
-        run: echo "[]" > odds_api_responses.json
+      - name: Prepare API data for output (fresh pull)
+        if: ${{ github.event.inputs.use_odds_api == 'true' }}
+        run: cp odds_api_responses.json odds_api_responses_active.json
+      
+      - name: Prepare API data for output (use saved)
+        if: ${{ github.event.inputs.use_odds_api == 'false' && github.event.inputs.include_api_in_output == 'true' }}
+        run: cp odds_api_responses.json odds_api_responses_active.json
+      
+      - name: Prepare API data for output (DK only)
+        if: ${{ github.event.inputs.use_odds_api == 'false' && github.event.inputs.include_api_in_output == 'false' }}
+        run: echo "[]" > odds_api_responses_active.json
       
       - name: Run Excel export
         run: python hr_excel.py
@@ -81,7 +89,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add hr_odds.xlsx all_responses.json
           git add -f dk_screenshot.png || true
-          if [ "${{ github.event.inputs.use_odds_api }}" == "true" ] || [ "${{ github.event.inputs.keep_previous_api }}" == "false" ]; then
+          if [ "${{ github.event.inputs.use_odds_api }}" == "true" ]; then
             git add odds_api_responses.json
           fi
           git commit -m "Update odds files - $(date)" || echo "No changes to commit"
