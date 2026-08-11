@@ -29,20 +29,18 @@ def fmt_odds(val):
     except:
         return "—"
 
-def get_player_name_dk(m):
-    if not isinstance(m, dict):
-        return None
-    if m.get("label") == "1+":
-        participants = m.get("participants")
-        if isinstance(participants, list) and participants:
-            name = participants[0].get("name")
-            if name:
-                return name
-    if "name" in m:
-        return m.get("name")
-    if "displayName" in m:
-        return m.get("displayName")
-    return None
+def avg_prob_to_odds(prob):
+    """Convert average implied probability back to American odds format"""
+    try:
+        if prob is None or prob <= 0 or prob >= 1:
+            return "—"
+        if prob >= 0.5:
+            odds = -round((prob / (1 - prob)) * 100)
+        else:
+            odds = round(((1 - prob) / prob) * 100)
+        return f"+{odds}" if odds > 0 else str(odds)
+    except:
+        return "—"
 
 # Parse DraftKings
 def parse_dk():
@@ -74,7 +72,6 @@ def parse_odds_api():
             return pd.DataFrame(columns=["player", "fd_odds", "bovada_odds"])
         df = pd.DataFrame(raw)
 
-        # Pivot to get one column per book
         fd = df[df["book_key"] == "fanduel"][["player", "odds"]].rename(columns={"odds": "fd_odds"})
         bov = df[df["book_key"] == "bovada"][["player", "odds"]].rename(columns={"odds": "bovada_odds"})
 
@@ -112,28 +109,29 @@ elif len(api_df) > 0:
 else:
     df = pd.DataFrame(columns=["player", "dk_odds", "fd_odds", "bovada_odds"])
 
-# Ensure all columns exist
 for col in ["dk_odds", "fd_odds", "bovada_odds"]:
     if col not in df.columns:
         df[col] = None
 
-# Calculate implied probs
+# Calculate implied probs and averages
 df["dk_implied"] = df["dk_odds"].apply(implied_prob)
 df["fd_implied"] = df["fd_odds"].apply(implied_prob)
 df["bov_implied"] = df["bovada_odds"].apply(implied_prob)
 df["avg_implied"] = df[["dk_implied", "fd_implied", "bov_implied"]].mean(axis=1)
+df["avg_odds"] = df["avg_implied"].apply(avg_prob_to_odds)
 df = df.sort_values("avg_implied", ascending=False, na_position="last")
 
-# Build output
+# Build output — avg odds and avg prob directly after player name
 out = pd.DataFrame({
     "Player":           df["player"],
+    "Avg Odds":         df["avg_odds"],
+    "Avg Impl. Prob":   df["avg_implied"].apply(fmt_prob),
     "DK Odds":          df["dk_odds"].apply(lambda x: fmt_odds(x) if pd.notna(x) else "—"),
     "DK Impl. Prob":    df["dk_implied"].apply(fmt_prob),
     "FanDuel Odds":     df["fd_odds"].apply(lambda x: fmt_odds(x) if pd.notna(x) else "—"),
     "FD Impl. Prob":    df["fd_implied"].apply(fmt_prob),
     "Bovada Odds":      df["bovada_odds"].apply(lambda x: fmt_odds(x) if pd.notna(x) else "—"),
     "Bov Impl. Prob":   df["bov_implied"].apply(fmt_prob),
-    "Avg Impl. Prob":   df["avg_implied"].apply(fmt_prob),
 })
 
 # Styling
