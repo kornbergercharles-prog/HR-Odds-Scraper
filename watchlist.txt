@@ -3,7 +3,6 @@ Bobby Witt Jr
 Salvador Perez
 Bryce Harper
 Willson Contreras
-Isaac Paredes
 Fernando Tatis Jr
 Samuel Basallo
 Jac Caglianone
@@ -12,5 +11,6 @@ Kody Clemens
 Coby Mayo
 Mark Vientos
 Ryan McMahon
-Garrett Mitchell
-Masataka Yoshida
+Eduardo Valencia
+Tommy Edman
+Enrique Hernandez
