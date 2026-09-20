@@ -3,7 +3,7 @@
     "player": "Kyle Schwarber",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 255
+    "odds": 250
   },
   {
     "player": "Bryce Harper",
@@ -36,22 +36,22 @@
     "odds": 600
   },
   {
+    "player": "Bryson Stott",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 680
+  },
+  {
     "player": "Francisco Alvarez",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 680
   },
   {
-    "player": "Bryson Stott",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 700
-  },
-  {
     "player": "Mark Vientos",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 700
+    "odds": 680
   },
   {
     "player": "Alec Bohm",
@@ -63,7 +63,7 @@
     "player": "Brandon Marsh",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 800
+    "odds": 750
   },
   {
     "player": "Marcus Semien",
@@ -219,13 +219,13 @@
     "player": "Jac Caglianone",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 390
+    "odds": 370
   },
   {
     "player": "Bobby Witt Jr.",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 440
+    "odds": 430
   },
   {
     "player": "Bryan Reynolds",
@@ -237,7 +237,7 @@
     "player": "Salvador Perez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 540
+    "odds": 520
   },
   {
     "player": "Rafael Flores",
@@ -252,13 +252,13 @@
     "odds": 630
   },
   {
-    "player": "Konnor Griffin",
+    "player": "Michael Massey",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 750
+    "odds": 680
   },
   {
-    "player": "Michael Massey",
+    "player": "Konnor Griffin",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 750
@@ -267,7 +267,7 @@
     "player": "John Rave",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 900
+    "odds": 870
   },
   {
     "player": "Maikel Garcia",
@@ -315,7 +315,7 @@
     "player": "Salvador Perez",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 525
+    "odds": 500
   },
   {
     "player": "Tyler Tolbert",
@@ -345,19 +345,19 @@
     "player": "Jac Caglianone",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 390
+    "odds": 370
   },
   {
     "player": "Bobby Witt Jr.",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 440
+    "odds": 430
   },
   {
     "player": "Michael Massey",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 750
+    "odds": 675
   },
   {
     "player": "Brandon Lowe",
@@ -393,7 +393,7 @@
     "player": "John Rave",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 900
+    "odds": 850
   },
   {
     "player": "Nick Gonzales",
@@ -855,7 +855,7 @@
     "player": "Pete Crow-Armstrong",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 210
+    "odds": 200
   },
   {
     "player": "Ian Happ",
@@ -873,19 +873,19 @@
     "player": "Michael Busch",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 360
-  },
-  {
-    "player": "Elly De La Cruz",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 390
+    "odds": 350
   },
   {
     "player": "JJ Bleday",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 390
+    "odds": 370
+  },
+  {
+    "player": "Elly De La Cruz",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 400
   },
   {
     "player": "Sal Stewart",
@@ -921,7 +921,7 @@
     "player": "Pedro Ramirez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 600
+    "odds": 560
   },
   {
     "player": "Dane Myers",
@@ -945,7 +945,13 @@
     "player": "Will Banfield",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 870
+    "odds": 900
+  },
+  {
+    "player": "Oswaldo Cabrera",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 1060
   },
   {
     "player": "Nico Hoerner",
@@ -957,7 +963,7 @@
     "player": "Elly De La Cruz",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 390
+    "odds": 400
   },
   {
     "player": "Seiya Suzuki",
@@ -975,7 +981,7 @@
     "player": "Michael Busch",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 360
+    "odds": 350
   },
   {
     "player": "Ian Happ",
@@ -1017,13 +1023,13 @@
     "player": "Pete Crow-Armstrong",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 210
+    "odds": 200
   },
   {
     "player": "JJ Bleday",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 390
+    "odds": 370
   },
   {
     "player": "Alex Bregman",
@@ -1041,13 +1047,13 @@
     "player": "Pedro Ramirez",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 600
+    "odds": 550
   },
   {
     "player": "Will Banfield",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 850
+    "odds": 900
   },
   {
     "player": "Ke'Bryan Hayes",
@@ -1065,7 +1071,7 @@
     "player": "Ronald Acuna Jr.",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 430
+    "odds": 440
   },
   {
     "player": "Matt Olson",
@@ -1080,19 +1086,19 @@
     "odds": 470
   },
   {
-    "player": "Isaac Paredes",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 520
-  },
-  {
     "player": "Jeremy Pena",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 520
+    "odds": 500
   },
   {
     "player": "Christian Walker",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 500
+  },
+  {
+    "player": "Isaac Paredes",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 520
@@ -1101,16 +1107,10 @@
     "player": "Michael Harris II",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 540
-  },
-  {
-    "player": "Drake Baldwin",
-    "book": "FanDuel",
-    "book_key": "fanduel",
     "odds": 560
   },
   {
-    "player": "Brice Matthews",
+    "player": "Drake Baldwin",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 600
@@ -1119,7 +1119,13 @@
     "player": "Yainer Diaz",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 680
+    "odds": 630
+  },
+  {
+    "player": "Brice Matthews",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 630
   },
   {
     "player": "Jose Altuve",
@@ -1143,7 +1149,7 @@
     "player": "Brewer Hicklen",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 830
+    "odds": 870
   },
   {
     "player": "Ha-Seong Kim",
@@ -1455,58 +1461,46 @@
     "player": "Alec Burleson",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 370
-  },
-  {
-    "player": "Andr\u00e9s Chaparro",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 400
-  },
-  {
-    "player": "Leonardo Bernal",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 430
+    "odds": 390
   },
   {
     "player": "James Wood",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 430
+    "odds": 400
   },
   {
     "player": "Jordan Walker",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 430
+    "odds": 420
+  },
+  {
+    "player": "Leonardo Bernal",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 440
+  },
+  {
+    "player": "Andr\u00e9s Chaparro",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 500
   },
   {
     "player": "JJ Wetherholt",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 540
+    "odds": 520
   },
   {
     "player": "Dylan Crews",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 540
+    "odds": 520
   },
   {
     "player": "Brady House",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 560
-  },
-  {
-    "player": "CJ Abrams",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 560
-  },
-  {
-    "player": "Yohandy Morales",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 560
@@ -1518,6 +1512,18 @@
     "odds": 630
   },
   {
+    "player": "CJ Abrams",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 600
+  },
+  {
+    "player": "Daylen Lile",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 680
+  },
+  {
     "player": "Thomas Saggese",
     "book": "FanDuel",
     "book_key": "fanduel",
@@ -1525,6 +1531,12 @@
   },
   {
     "player": "Harry Ford",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 900
+  },
+  {
+    "player": "Jose Fermin",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 900
@@ -1542,19 +1554,13 @@
     "odds": 1000
   },
   {
-    "player": "Jose Fermin",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 1000
-  },
-  {
     "player": "Jacob Young",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 1060
+    "odds": 1100
   },
   {
-    "player": "Jorbit Vivas",
+    "player": "Nasim Nunez",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 1500
@@ -1653,145 +1659,145 @@
     "player": "Kazuma Okamoto",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 430
+    "odds": 420
   },
   {
     "player": "Wyatt Langford",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 490
+    "odds": 470
   },
   {
     "player": "Jake Burger",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 520
+    "odds": 480
   },
   {
     "player": "Vladimir Guerrero Jr.",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 540
+    "odds": 520
   },
   {
     "player": "Brandon Nimmo",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 650
+    "odds": 630
   },
   {
     "player": "Sean Keys",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 680
+    "odds": 630
   },
   {
     "player": "Danny Jansen",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 730
+    "odds": 680
   },
   {
     "player": "Josh Jung",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 790
+    "odds": 750
   },
   {
     "player": "Evan Carter",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 880
+    "odds": 800
   },
   {
     "player": "Nathan Lukes",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 880
+    "odds": 800
   },
   {
     "player": "Andres Gimenez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 920
+    "odds": 870
   },
   {
     "player": "Josh Smith",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 920
+    "odds": 870
   },
   {
     "player": "Ezequiel Duran",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 920
+    "odds": 900
   },
   {
     "player": "Brandon Valenzuela",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 980
+    "odds": 900
   },
   {
     "player": "Brett Bateman",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 1120
+    "odds": 1060
   },
   {
     "player": "Ernie Clement",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 1120
+    "odds": 1060
   },
   {
     "player": "Nicky Lopez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 1800
+    "odds": 1700
   },
   {
     "player": "Josh Jung",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 775
+    "odds": 750
   },
   {
     "player": "Evan Carter",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 875
+    "odds": 800
   },
   {
     "player": "Andres Gimenez",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 900
+    "odds": 850
   },
   {
     "player": "Josh Smith",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 900
+    "odds": 850
   },
   {
     "player": "Nicky Lopez",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 1800
+    "odds": 1700
   },
   {
     "player": "Vladimir Guerrero Jr.",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 525
+    "odds": 500
   },
   {
     "player": "Kazuma Okamoto",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 430
+    "odds": 420
   },
   {
     "player": "Brett Bateman",
@@ -1803,7 +1809,7 @@
     "player": "Wyatt Langford",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 475
+    "odds": 460
   },
   {
     "player": "Corey Seager",
@@ -1815,7 +1821,7 @@
     "player": "Nathan Lukes",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 875
+    "odds": 800
   },
   {
     "player": "Ezequiel Duran",
@@ -1827,13 +1833,13 @@
     "player": "Brandon Nimmo",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 650
+    "odds": 625
   },
   {
     "player": "Jake Burger",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 500
+    "odds": 475
   },
   {
     "player": "Ernie Clement",
@@ -1845,49 +1851,49 @@
     "player": "Danny Jansen",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 725
+    "odds": 675
   },
   {
     "player": "Sean Keys",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 675
+    "odds": 625
   },
   {
     "player": "Brandon Valenzuela",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 1000
+    "odds": 900
   },
   {
     "player": "Cal Raleigh",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 270
+    "odds": 240
   },
   {
     "player": "Hunter Goodman",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 340
+    "odds": 320
+  },
+  {
+    "player": "Dominic Canzone",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 390
   },
   {
     "player": "Julio Rodriguez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 370
+    "odds": 390
   },
   {
     "player": "Randy Arozarena",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 390
-  },
-  {
-    "player": "Dominic Canzone",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 410
   },
   {
     "player": "Lazaro Montes",
@@ -1896,61 +1902,67 @@
     "odds": 420
   },
   {
+    "player": "J.P. Crawford",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 610
+  },
+  {
     "player": "Josh Naylor",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 630
   },
   {
-    "player": "Ezequiel Tovar",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 730
-  },
-  {
     "player": "Cole Young",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 730
+    "odds": 680
   },
   {
     "player": "Connor Norby",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 730
+    "odds": 680
   },
   {
-    "player": "J.P. Crawford",
+    "player": "Brett Sullivan",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 790
-  },
-  {
-    "player": "Cole Carrigg",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 790
+    "odds": 710
   },
   {
     "player": "Brock Rodden",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 820
+    "odds": 730
   },
   {
-    "player": "TJ Rumfield",
+    "player": "Cole Carrigg",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 880
+    "odds": 760
+  },
+  {
+    "player": "Kyle Karros",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 790
+  },
+  {
+    "player": "Ezequiel Tovar",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 820
   },
   {
     "player": "Jordan Beck",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 880
+    "odds": 820
   },
   {
-    "player": "Kyle Karros",
+    "player": "Adael Amador",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 920
@@ -1959,13 +1971,13 @@
     "player": "Jake McCarthy",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 980
+    "odds": 1040
   },
   {
-    "player": "Adael Amador",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 980
+    "player": "Brett Sullivan",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 700
   },
   {
     "player": "Randy Arozarena",
@@ -1977,43 +1989,43 @@
     "player": "Jordan Beck",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 875
+    "odds": 800
   },
   {
     "player": "Cal Raleigh",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 270
+    "odds": 240
   },
   {
     "player": "Cole Young",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 725
+    "odds": 675
   },
   {
     "player": "Brock Rodden",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 800
+    "odds": 725
   },
   {
     "player": "Cole Carrigg",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 775
+    "odds": 750
   },
   {
     "player": "Kyle Karros",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 900
+    "odds": 775
   },
   {
     "player": "J.P. Crawford",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 775
+    "odds": 600
   },
   {
     "player": "Josh Naylor",
@@ -2031,7 +2043,7 @@
     "player": "Hunter Goodman",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 340
+    "odds": 320
   },
   {
     "player": "Jake McCarthy",
@@ -2043,37 +2055,31 @@
     "player": "Julio Rodriguez",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 370
+    "odds": 390
   },
   {
     "player": "Adael Amador",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 1000
+    "odds": 900
   },
   {
     "player": "Connor Norby",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 725
+    "odds": 675
   },
   {
     "player": "Ezequiel Tovar",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 725
+    "odds": 800
   },
   {
     "player": "Dominic Canzone",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 410
-  },
-  {
-    "player": "TJ Rumfield",
-    "book": "Bovada",
-    "book_key": "bovada",
-    "odds": 875
+    "odds": 390
   },
   {
     "player": "Kody Clemens",
@@ -2181,6 +2187,114 @@
     "player": "Wade Meckler",
     "book": "FanDuel",
     "book_key": "fanduel",
+    "odds": 1200
+  },
+  {
+    "player": "Kody Clemens",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 350
+  },
+  {
+    "player": "Mike Trout",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 360
+  },
+  {
+    "player": "Zach Neto",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 390
+  },
+  {
+    "player": "Josh Bell",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 440
+  },
+  {
+    "player": "Emmanuel Rodriguez",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 440
+  },
+  {
+    "player": "Ryan Jeffers",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 440
+  },
+  {
+    "player": "Royce Lewis",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 460
+  },
+  {
+    "player": "Jose Siri",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 475
+  },
+  {
+    "player": "Moises Ballesteros",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 525
+  },
+  {
+    "player": "Josh Lowe",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 525
+  },
+  {
+    "player": "Brooks Lee",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 550
+  },
+  {
+    "player": "Walker Jenkins",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 600
+  },
+  {
+    "player": "Ben Ross",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 700
+  },
+  {
+    "player": "Vaughn Grissom",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 775
+  },
+  {
+    "player": "Denzer Guzman",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 800
+  },
+  {
+    "player": "Luke Keaschall",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 800
+  },
+  {
+    "player": "Christian Moore",
+    "book": "Bovada",
+    "book_key": "bovada",
+    "odds": 900
+  },
+  {
+    "player": "Wade Meckler",
+    "book": "Bovada",
+    "book_key": "bovada",
     "odds": 1200
   },
   {
@@ -2409,7 +2523,7 @@
     "player": "Will Smith",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 370
+    "odds": 360
   },
   {
     "player": "Mookie Betts",
@@ -2424,22 +2538,22 @@
     "odds": 470
   },
   {
+    "player": "Freddie Freeman",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 520
+  },
+  {
     "player": "Tommy Edman",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 490
+    "odds": 520
   },
   {
     "player": "Kyle Tucker",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 520
-  },
-  {
-    "player": "Freddie Freeman",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 520
+    "odds": 540
   },
   {
     "player": "Shay Whitcomb",
@@ -2466,6 +2580,12 @@
     "odds": 880
   },
   {
+    "player": "Josue De Paula",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 880
+  },
+  {
     "player": "Andrew Knizner",
     "book": "FanDuel",
     "book_key": "fanduel",
@@ -2484,13 +2604,13 @@
     "odds": 920
   },
   {
-    "player": "Josue De Paula",
+    "player": "Scott Bandura",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 920
+    "odds": 1120
   },
   {
-    "player": "Scott Bandura",
+    "player": "Turner Hill",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 1200
@@ -2500,12 +2620,6 @@
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 1200
-  },
-  {
-    "player": "Turner Hill",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 1260
   },
   {
     "player": "Teoscar Hernandez",
@@ -2541,19 +2655,19 @@
     "player": "Kyle Tucker",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 500
+    "odds": 525
   },
   {
     "player": "Josue De Paula",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 900
+    "odds": 875
   },
   {
     "player": "Turner Hill",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 1300
+    "odds": 1200
   },
   {
     "player": "Jung Hoo Lee",
@@ -2577,7 +2691,7 @@
     "player": "Tommy Edman",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 475
+    "odds": 500
   },
   {
     "player": "Christian Koss",
@@ -2601,7 +2715,7 @@
     "player": "Will Smith",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 370
+    "odds": 360
   },
   {
     "player": "Bryce Eldridge",
@@ -2613,7 +2727,7 @@
     "player": "Scott Bandura",
     "book": "Bovada",
     "book_key": "bovada",
-    "odds": 1200
+    "odds": 1100
   },
   {
     "player": "Kyle Stowers",
@@ -2631,19 +2745,19 @@
     "player": "Heriberto Hernandez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 420
+    "odds": 410
   },
   {
     "player": "Jackson Merrill",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 420
+    "odds": 410
   },
   {
     "player": "Manny Machado",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 430
+    "odds": 420
   },
   {
     "player": "Griffin Conine",
@@ -2655,13 +2769,13 @@
     "player": "Ty France",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 610
+    "odds": 630
   },
   {
     "player": "Agust\u00edn Ram\u00edrez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 650
+    "odds": 630
   },
   {
     "player": "Luis Campusano",
@@ -2679,22 +2793,22 @@
     "player": "Otto Lopez",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 760
+    "odds": 790
+  },
+  {
+    "player": "Graham Pauley",
+    "book": "FanDuel",
+    "book_key": "fanduel",
+    "odds": 820
   },
   {
     "player": "Dustin Harris",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 820
+    "odds": 880
   },
   {
     "player": "Xander Bogaerts",
-    "book": "FanDuel",
-    "book_key": "fanduel",
-    "odds": 820
-  },
-  {
-    "player": "Graham Pauley",
     "book": "FanDuel",
     "book_key": "fanduel",
     "odds": 880
@@ -2709,13 +2823,13 @@
     "player": "Jake Cronenworth",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 980
+    "odds": 920
   },
   {
     "player": "Javier Sanoja",
     "book": "FanDuel",
     "book_key": "fanduel",
-    "odds": 1120
+    "odds": 1200
   },
   {
     "player": "Samad Taylor",
